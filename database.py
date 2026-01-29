@@ -50,7 +50,9 @@ class Database:
         
         cursor = self.conn.cursor()
         
-        cursor.execute(, (subreddit,))
+        cursor.execute("""
+            SELECT last_scrape_timestamp FROM last_scrape WHERE subreddit = ?
+        """, (subreddit,))
         
         row = cursor.fetchone()
         return row['last_scrape_timestamp'] if row else None
@@ -60,7 +62,10 @@ class Database:
         cursor = self.conn.cursor()
         timestamp = datetime.utcnow().timestamp()
         
-        cursor.execute(, (subreddit, timestamp))
+        cursor.execute("""
+            INSERT OR REPLACE INTO last_scrape (subreddit, last_scrape_timestamp)
+            VALUES (?, ?)
+        """, (subreddit, timestamp))
         
         self.conn.commit()
     
