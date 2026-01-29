@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+import os
 from flask import Flask, render_template, jsonify, request, Response
 import threading
 import subprocess
 from database import Database
+
+# Change to script directory to find database
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
 
