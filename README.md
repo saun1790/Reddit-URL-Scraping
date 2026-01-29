@@ -1,39 +1,50 @@
-# 🔗 Reddit URL Scraper
+# Reddit URL Scraper
 
-Sistema profesional para extraer URLs externas de posts de Reddit. Incluye dashboard web interactivo y capacidad de backfill hasta 6 meses de datos históricos.
-
----
-
-## 📋 Requisitos
-
-- **Python 3.8+**
-- **macOS / Linux / Windows**
-- Conexión a Internet
+Professional tool to extract external URLs from Reddit subreddit posts. Includes interactive web dashboard and supports historical data backfill up to 6 months.
 
 ---
 
-## ⚡ Instalación Rápida
+## Features
 
-### 1. Instalar Dependencias
+- ✅ **Backfill mode**: Extract posts from last N days (up to 180 days / 6 months)
+- ✅ **Daily mode**: Fetch only new posts since last run
+- ✅ **No duplicates**: SQLite database with unique constraints
+- ✅ **Smart filtering**: Ignores Reddit internal links
+- ✅ **Multiple subreddits**: Track unlimited subreddits simultaneously
+- ✅ **CSV export**: Clean output with one click
+- ✅ **Web dashboard**: Interactive UI with search, sort, and filters
+
+---
+
+## Requirements
+
+- Python 3.8+
+- Internet connection
+
+---
+
+## Installation
+
+### 1. Install Dependencies
 
 ```bash
 cd reddit_scraper
 python3 -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Configuración Inicial (Primera vez)
+### 2. No API Keys Required
 
-El scraper NO requiere API keys de Reddit. Usa el API público sin autenticación.
+This scraper uses Reddit's public API without authentication.
 
 ---
 
-## 🚀 Uso
+## Usage
 
-### Opción 1: Dashboard Web (Recomendado)
+### Option 1: Web Dashboard (Recommended)
 
-**Iniciar el servidor:**
+**Start the server:**
 
 ```bash
 cd reddit_scraper
@@ -41,60 +52,50 @@ source venv/bin/activate
 python web_viewer.py
 ```
 
-**Abrir en navegador:**
+**Open in browser:**
 
 ```
 http://localhost:3010
 ```
 
-#### Funcionalidades del Dashboard:
+**Dashboard Features:**
 
-- ✅ **Ver todas las URLs** con búsqueda y filtros
-- ✅ **Ordenar columnas** haciendo clic en las cabeceras
-- ✅ **Redimensionar columnas** arrastrando los bordes
-- ✅ **Fetch URLs** con progreso en tiempo real
-- ✅ **Exportar a CSV** con un clic
-- ✅ **Configurar subreddits** desde el menú Settings
-
-#### Cómo usar el Fetch:
-
-1. Clic en **"⚡ Fetch URLs"**
-2. Seleccionar modo:
-   - **Daily**: Solo posts nuevos desde la última ejecución
-   - **Backfill**: Histórico (hasta 180 días / ~6 meses)
-3. Configurar días si es Backfill
-4. Ver progreso en tiempo real
-5. ¡Listo! Los datos se actualizan automáticamente
+- View all URLs with search and filters
+- Sort columns by clicking headers
+- Resize columns by dragging edges
+- Fetch URLs with real-time progress
+- Export to CSV
+- Configure subreddits
 
 ---
 
-### Opción 2: Línea de Comandos
+### Option 2: Command Line
 
-#### Primera vez - Obtener datos históricos (6 meses):
+**Initial backfill (6 months of data):**
 
 ```bash
 python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject
 ```
 
-#### Uso diario - Solo datos nuevos:
+**Daily update (new posts only):**
 
 ```bash
 python reddit_scraper_noauth.py --daily --subreddits SideProject
 ```
 
-#### Múltiples subreddits:
+**Multiple subreddits:**
 
 ```bash
 python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups entrepreneur
 ```
 
-#### Exportar a CSV:
+**Export to CSV:**
 
 ```bash
-python reddit_scraper_noauth.py --export mi_archivo.csv
+python reddit_scraper_noauth.py --export output.csv
 ```
 
-#### Ver estadísticas:
+**Show statistics:**
 
 ```bash
 python reddit_scraper_noauth.py --stats
@@ -102,162 +103,103 @@ python reddit_scraper_noauth.py --stats
 
 ---
 
-## 📊 Datos Extraídos
+## Data Structure
 
-El sistema guarda:
-
-| Campo | Descripción | Ejemplo |
+| Field | Description | Example |
 |-------|-------------|---------|
-| **url** | URL externa encontrada | https://example.com |
-| **post_date** | Fecha del post | 2026-01-29 10:30:15 |
-| **subreddit** | Subreddit de origen | SideProject |
-| **post_id** | ID único del post | 1qq7qfq |
+| **url** | External URL found | https://example.com |
+| **post_date** | Post timestamp | 2026-01-29 10:30:15 |
+| **subreddit** | Source subreddit | SideProject |
+| **post_id** | Unique post ID | 1qq7qfq |
 
-**Base de datos:** `reddit_urls.db` (SQLite)
+**Database:** SQLite stored in `reddit_urls.db`
 
-**Exportación CSV:** Formato estándar compatible con Excel/Google Sheets
-
----
-
-## ⚙️ Configurar Subreddits
-
-### Desde el Dashboard:
-
-1. Clic en **"⚙️ Settings"**
-2. Agregar o quitar subreddits
-3. Se guardan automáticamente
-
-### Desde línea de comandos:
-
-Simplemente lista los subreddits al ejecutar:
-
-```bash
-python reddit_scraper_noauth.py --daily --subreddits SideProject startups entrepreneur
-```
+**CSV Export:** Standard format compatible with Excel/Google Sheets
 
 ---
 
-## 🔄 Automatización (Opcional)
+## Automation
 
-### Ejecutar automáticamente cada día:
-
-**macOS/Linux - Cron:**
+### macOS/Linux - Cron
 
 ```bash
 crontab -e
 ```
 
-Agregar esta línea (reemplaza la ruta):
+Add this line (replace path):
 
 ```bash
-0 9 * * * cd /ruta/a/reddit_scraper && ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
+0 9 * * * cd /path/to/reddit_scraper && ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
 ```
 
-Esto ejecutará el scraper todos los días a las 9:00 AM.
+This runs the scraper daily at 9:00 AM.
 
-**Windows - Task Scheduler:**
+### Windows - Task Scheduler
 
-1. Abrir "Programador de tareas"
-2. Crear tarea básica
-3. Acción: Ejecutar programa
-4. Programa: `C:\ruta\a\venv\Scripts\python.exe`
-5. Argumentos: `reddit_scraper_noauth.py --daily --subreddits SideProject`
-6. Carpeta de inicio: `C:\ruta\a\reddit_scraper`
-
----
-
-## 📈 Capacidades
-
-| Característica | Detalle |
-|----------------|---------|
-| **Datos históricos** | Hasta 6 meses (~180 días) |
-| **Subreddits simultáneos** | Ilimitados |
-| **Sin duplicados** | Constraint único en base de datos |
-| **Rate limiting** | Respeta límites de Reddit automáticamente |
-| **URLs procesadas** | Filtra links internos de Reddit |
-| **Actualización diaria** | Solo trae posts nuevos |
+1. Open Task Scheduler
+2. Create Basic Task
+3. Action: Start a program
+4. Program: `C:\path\to\venv\Scripts\python.exe`
+5. Arguments: `reddit_scraper_noauth.py --daily --subreddits SideProject`
+6. Start in: `C:\path\to\reddit_scraper`
 
 ---
 
-## 🎯 Casos de Uso
+## Capabilities
 
-- Monitorear lanzamientos de productos en r/SideProject
-- Seguir trends en r/startups, r/entrepreneur
-- Análisis de contenido externo compartido
-- Lead generation de nuevos proyectos
-- Research de competencia
-
----
-
-## 🛠️ Comandos Útiles
-
-```bash
-# Ver cuántas URLs tienes
-python reddit_scraper_noauth.py --stats
-
-# Exportar todo a CSV
-python reddit_scraper_noauth.py --export reddit_urls_$(date +%Y%m%d).csv
-
-# Backfill 3 meses de varios subreddits
-python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups entrepreneur
-
-# Iniciar dashboard
-python web_viewer.py
-```
+| Feature | Details |
+|---------|---------|
+| **Historical data** | Up to 6 months (~180 days) |
+| **Concurrent subreddits** | Unlimited |
+| **Deduplication** | Automatic via database constraints |
+| **Rate limiting** | Built-in Reddit API compliance |
+| **URL filtering** | Removes Reddit internal links |
+| **Daily updates** | Incremental scraping |
 
 ---
 
-## 📂 Estructura de Archivos
+## Project Structure
 
 ```
 reddit_scraper/
-├── reddit_scraper_noauth.py  # Script principal
-├── web_viewer.py              # Dashboard web
-├── database.py                # Gestión de SQLite
-├── reddit_urls.db            # Base de datos
-├── requirements.txt           # Dependencias Python
+├── reddit_scraper_noauth.py  # Main scraper
+├── web_viewer.py              # Web dashboard
+├── database.py                # SQLite handler
+├── reddit_urls.db            # Database file
+├── requirements.txt           # Python dependencies
 ├── templates/
-│   └── index.html            # Frontend del dashboard
-└── README.md                 # Este archivo
+│   └── index.html            # Dashboard frontend
+└── README.md                 # Documentation
 ```
 
 ---
 
-## ❓ Problemas Comunes
-
-### El dashboard no carga:
+## Useful Commands
 
 ```bash
-# Verificar que el puerto 3010 esté libre
-lsof -i :3010
+python reddit_scraper_noauth.py --stats
 
-# Reiniciar el servidor
-pkill -f web_viewer.py
+python reddit_scraper_noauth.py --export reddit_urls_$(date +%Y%m%d).csv
+
+python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups
+
 python web_viewer.py
 ```
 
-### No encuentra posts antiguos:
+---
 
-Reddit API tiene límites. Con múltiples endpoints podemos obtener ~6 meses para subreddits activos.
+## License
 
-### Error de conexión:
-
-Verificar conexión a internet y que Reddit no esté caído.
+MIT License - Free to use and modify.
 
 ---
 
-## 📞 Soporte
+## Quick Start
 
-Para dudas o problemas:
+1. Install dependencies: `pip install -r requirements.txt`
+2. Start dashboard: `python web_viewer.py`
+3. Open browser: `http://localhost:3010`
+4. Click "Fetch URLs" and select Backfill (90-180 days)
+5. Done! URLs are stored in the database
 
-1. Verificar que el entorno virtual esté activado: `source venv/bin/activate`
-2. Ver logs en la terminal donde corre el servidor
-3. Revisar `reddit_urls.db` con `sqlite3 reddit_urls.db`
-
----
-
-## 🎉 ¡Listo!
-
-Ya tienes todo configurado. Abre **http://localhost:3010** y empieza a extraer URLs de Reddit.
-
-**Recomendación:** Ejecuta un backfill de 90-180 días la primera vez, luego usa modo `--daily` para mantener actualizado.
+**Recommendation:** Run a 90-180 day backfill first, then use daily mode to keep updated.
