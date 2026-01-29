@@ -11,6 +11,52 @@ Extract external URLs from Reddit subreddit posts. Includes web dashboard and hi
 - CSV export: One click download
 - Web dashboard: Interactive UI with search and filters
 
+## Prerequisites
+
+### Linux (Ubuntu/Debian)
+
+```bash
+sudo apt update
+sudo apt install python3 python3-venv python3-pip git -y
+python3 --version
+```
+
+### Linux (CentOS/RHEL/Fedora)
+
+```bash
+sudo dnf install python3 python3-pip git -y
+python3 --version
+```
+
+### macOS
+
+```bash
+# Install Homebrew (if not installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python and Git
+brew install python git
+python3 --version
+```
+
+### Windows
+
+1. **Install Python:**
+   - Download from https://www.python.org/downloads/
+   - Run installer
+   - **IMPORTANT:** Check "Add Python to PATH" during installation
+   - Click "Install Now"
+
+2. **Install Git:**
+   - Download from https://git-scm.com/download/win
+   - Run installer with default options
+
+3. **Verify installation (PowerShell):**
+   ```powershell
+   python --version
+   git --version
+   ```
+
 ## Installation
 
 ### Linux / macOS
