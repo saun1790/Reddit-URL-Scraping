@@ -2,79 +2,55 @@
 
 Extract external URLs from Reddit subreddit posts. Includes web dashboard and historical backfill up to 6 months.
 
-## Technologies
-
-| Component | Technology | Description |
-|-----------|------------|-------------|
-| **Backend** | Python 3.8+ | Main programming language |
-| **Web Framework** | Flask | Lightweight web server for dashboard |
-| **Database** | SQLite | Local database, no server required |
-| **Reddit Data** | Reddit Public API | No authentication required, uses JSON endpoints |
-| **Frontend** | HTML5 / CSS3 / JavaScript | Single-page dashboard with vanilla JS |
-| **HTTP Client** | Requests | Python library for API calls |
+![Dashboard Preview](https://img.shields.io/badge/Dashboard-Live-green) ![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue)
 
 ## Features
 
-- Backfill mode: Extract posts from last N days (up to 180 days)
-- Daily mode: Fetch only new posts since last run
-- No duplicates: SQLite database with unique constraints
-- Multiple subreddits: Track unlimited subreddits
-- CSV export: One click download
-- Web dashboard: Interactive UI with search and filters
+- 🔄 **Backfill mode**: Extract posts from last N days (up to 180 days)
+- 📅 **Daily mode**: Fetch only new posts since last run
+- 🚫 **No duplicates**: SQLite database with unique constraints
+- 📊 **Multiple subreddits**: Track unlimited subreddits
+- 📥 **CSV export**: One click download
+- 🖥️ **Web dashboard**: Interactive UI with search, filters, and pagination
+- 🔓 **No API keys required**: Uses Reddit's public JSON endpoints
+
+## Technologies
+
+| Component | Technology |
+|-----------|------------|
+| Backend | Python 3.8+ |
+| Web Framework | Flask |
+| Database | SQLite |
+| Reddit Data | Public JSON API (no auth) |
+| Frontend | HTML5 / CSS3 / Vanilla JS |
 
 ## Prerequisites
 
 ### Linux (Ubuntu/Debian)
-
 ```bash
 sudo apt update
 sudo apt install python3 python3-venv python3-pip git -y
-python3 --version
 ```
 
 ### Linux (CentOS/RHEL/Fedora)
-
 ```bash
 sudo dnf install python3 python3-pip git -y
-python3 --version
 ```
 
 ### macOS
-
 ```bash
-# Install Homebrew (if not installed)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install Python and Git
 brew install python git
-python3 --version
 ```
 
 ### Windows
-
-1. **Install Python:**
-   - Download from https://www.python.org/downloads/
-   - Run installer
-   - **IMPORTANT:** Check "Add Python to PATH" during installation
-   - Click "Install Now"
-
-2. **Install Git:**
-   - Download from https://git-scm.com/download/win
-   - Run installer with default options
-
-3. **Verify installation (PowerShell):**
-   ```powershell
-   python --version
-   git --version
-   ```
+1. Download Python from https://www.python.org/downloads/
+2. **IMPORTANT:** Check "Add Python to PATH" during installation
+3. Download Git from https://git-scm.com/download/win
 
 ## Installation
 
 ### Linux / macOS
-
 ```bash
-mkdir ~/projects
-cd ~/projects
 git clone https://github.com/saun1790/Reddit-URL-Scraping.git
 cd Reddit-URL-Scraping
 python3 -m venv venv
@@ -82,168 +58,139 @@ python3 -m venv venv
 ```
 
 ### Windows (PowerShell)
-
 ```powershell
-mkdir C:\projects
-cd C:\projects
 git clone https://github.com/saun1790/Reddit-URL-Scraping.git
 cd Reddit-URL-Scraping
 python -m venv venv
 .\venv\Scripts\pip install -r requirements.txt
 ```
 
-## Web Dashboard
+## Quick Start
 
-### Linux / macOS
+### Start the Web Dashboard
 
-**Start server:**
+**Linux / macOS:**
 ```bash
-cd ~/projects/Reddit-URL-Scraping
 ./venv/bin/python web_viewer.py
 ```
 
-**Output when server starts:**
-```
-==================================================
-🔗 Reddit URL Scraper
-==================================================
-
-🚀 http://localhost:3010
-
- * Running on http://127.0.0.1:3010
- * Running on http://YOUR_IP:3010
-```
-
-**Access the dashboard:**
-- Local: http://localhost:3010
-- Network: http://YOUR_IP:3010 (from other devices on same network)
-
-**Start in background:**
-```bash
-cd ~/projects/Reddit-URL-Scraping
-nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
-echo $! > web_viewer.pid
-echo "Server started! Open http://localhost:3010"
-```
-
-**Stop server:**
-```bash
-kill $(cat web_viewer.pid)
-```
-
-**Restart server:**
-```bash
-kill $(cat web_viewer.pid) 2>/dev/null
-nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
-echo $! > web_viewer.pid
-```
-
-**View logs:**
-```bash
-tail -f web_viewer.log
-```
-
-### Windows
-
-**Start server:**
+**Windows:**
 ```powershell
-cd C:\projects\Reddit-URL-Scraping
 .\venv\Scripts\python web_viewer.py
 ```
 
-**Start in background:**
-```powershell
-cd C:\projects\Reddit-URL-Scraping
-Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py"
-Write-Host "Server started! Open http://localhost:3010"
-```
+Open your browser: **http://localhost:3010**
 
-**Stop server:**
-```powershell
-Get-Process python | Stop-Process
-```
+### Dashboard Features
 
-**Access the dashboard:**
-- Open browser: http://localhost:3010
+1. **⚙️ Settings** - Configure which subreddits to track (comma-separated, without r/)
+2. **⚡ Fetch URLs** - Run scraper in Daily or Backfill mode
+3. **🔍 Search** - Filter URLs by keyword
+4. **📥 Export CSV** - Download all data
 
-## Command Line
+## Command Line Usage
 
-### Linux / macOS
-
-**Backfill 6 months:**
+### Backfill (Historical Data)
 ```bash
-cd ~/projects/Reddit-URL-Scraping
-./venv/bin/python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject
+# Last 30 days
+./venv/bin/python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
+
+# Last 6 months, multiple subreddits
+./venv/bin/python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups entrepreneur
 ```
 
-**Daily update:**
+### Daily Update
 ```bash
 ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
 ```
 
-**Multiple subreddits:**
+### Export to CSV
 ```bash
-./venv/bin/python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups entrepreneur
+./venv/bin/python reddit_scraper_noauth.py --export urls.csv
 ```
 
-**Export CSV:**
-```bash
-./venv/bin/python reddit_scraper_noauth.py --export output.csv
-```
-
-**Statistics:**
+### View Statistics
 ```bash
 ./venv/bin/python reddit_scraper_noauth.py --stats
 ```
 
-### Windows
+## Running in Background
 
-**Backfill 6 months:**
-```powershell
-cd C:\projects\Reddit-URL-Scraping
-.\venv\Scripts\python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject
+### Linux / macOS
+```bash
+# Start
+nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
+echo $! > web_viewer.pid
+
+# Stop
+kill $(cat web_viewer.pid)
+
+# View logs
+tail -f web_viewer.log
 ```
 
-**Daily update:**
+### Windows (PowerShell)
 ```powershell
-.\venv\Scripts\python reddit_scraper_noauth.py --daily --subreddits SideProject
+# Start
+Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py"
+
+# Stop
+Get-Process python | Stop-Process
 ```
 
 ## Automation (Cron)
 
-### Linux / macOS
-
+Run daily at 9 AM:
 ```bash
 crontab -e
 ```
 
 Add:
 ```bash
-0 9 * * * cd ~/projects/Reddit-URL-Scraping && ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject >> cron.log 2>&1
+0 9 * * * cd /path/to/Reddit-URL-Scraping && ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject >> cron.log 2>&1
 ```
 
 ## Data Structure
 
 | Field | Description |
 |-------|-------------|
-| url | External URL found |
-| post_date | Post timestamp |
-| subreddit | Source subreddit |
-| post_id | Reddit post ID |
+| `url` | External URL found in post |
+| `post_date` | Post timestamp (UTC) |
+| `subreddit` | Source subreddit |
+| `post_id` | Reddit post ID |
 
-Database: `reddit_urls.db` (SQLite)
+Database file: `reddit_urls.db` (SQLite, created on first run)
 
 ## Project Structure
 
 ```
 Reddit-URL-Scraping/
-├── web_viewer.py             # Web dashboard
-├── reddit_scraper_noauth.py  # Main scraper
-├── database.py               # SQLite handler
-├── reddit_urls.db            # Database (created on first run)
-├── requirements.txt          # Dependencies
-└── templates/
-    └── index.html            # Dashboard UI
+├── web_viewer.py             # Web dashboard server
+├── reddit_scraper_noauth.py  # Main scraper (CLI)
+├── database.py               # SQLite database handler
+├── requirements.txt          # Python dependencies
+├── templates/
+│   └── index.html            # Dashboard UI
+└── reddit_urls.db            # Database (auto-created)
+```
+
+## Troubleshooting
+
+**Port 3010 already in use:**
+```bash
+# Find and kill process
+lsof -i :3010
+kill -9 <PID>
+```
+
+**Permission denied:**
+```bash
+chmod +x ./venv/bin/python
+```
+
+**Module not found:**
+```bash
+./venv/bin/pip install -r requirements.txt
 ```
 
 ## License
