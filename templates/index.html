@@ -30,6 +30,7 @@
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
         .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: #4393e6; }
         .btn-warning { background: var(--warning); color: #000; }
         .btn-ghost { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--border); }
@@ -84,6 +85,17 @@
         .progress-info { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; color: var(--text-muted); }
         .progress-log { margin-top: 12px; background: var(--bg); padding: 12px; border-radius: 6px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; }
         .confirm-msg { margin: 16px 0; line-height: 1.5; }
+        
+        /* Tags styles */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 40px; }
+        .tag { display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: #fff; padding: 6px 10px; border-radius: 20px; font-size: 13px; animation: tagIn 0.2s ease; }
+        .tag-prefix { opacity: 0.7; }
+        .tag-remove { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; transition: background 0.2s; }
+        .tag-remove:hover { background: rgba(255,255,255,0.4); }
+        @keyframes tagIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .add-tag-form { display: flex; gap: 8px; }
+        .add-tag-form input { flex: 1; }
+        .empty-tags { color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center; border: 2px dashed var(--border); border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -92,7 +104,6 @@
             <h1>🔗 Reddit URL Scraper</h1>
             <div class="header-actions">
                 <button class="btn-ghost" onclick="openSettings()">⚙️ Settings</button>
-                
                 <button class="btn-warning" onclick="openFetchModal()">⚡ Fetch URLs</button>
                 <a href="/api/export"><button class="btn-ghost">📥 Export CSV</button></a>
             </div>
@@ -120,12 +131,18 @@
         <div class="modal-content">
             <h2>⚙️ Settings</h2>
             <div class="form-group">
-                <label>Subreddits (comma separated, without r/)</label>
-                <input type="text" id="subredditsInput" placeholder="SideProject, startups">
+                <label>Add Subreddit</label>
+                <div class="add-tag-form">
+                    <input type="text" id="newSubredditInput" placeholder="e.g. SideProject" onkeydown="if(event.key==='Enter'){event.preventDefault();addSubreddit();}">
+                    <button class="btn-primary" onclick="addSubreddit()">+ Add</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tracked Subreddits</label>
+                <div class="tags-container" id="subredditTags"></div>
             </div>
             <div class="modal-actions">
-                <button class="btn-ghost" onclick="closeModal('settingsModal')">Cancel</button>
-                <button class="btn-primary" onclick="saveSettings()">Save</button>
+                <button class="btn-ghost" onclick="closeModal('settingsModal')">Close</button>
             </div>
         </div>
     </div>
@@ -184,20 +201,63 @@
         </div>
     </div>
     
-    <div class="modal" id="fixModal">
-        <div class="modal-content">
-            <h2>🔧 Fix Malformed URLs</h2>
-            <p class="confirm-msg">This will automatically fix URLs with malformed markdown patterns and remove invalid entries.</p>
-            <div id="fixResult" style="display:none; margin-top:16px; padding:12px; background:var(--bg); border-radius:6px;"></div>
-            <div class="modal-actions">
-                <button class="btn-ghost" onclick="closeModal('fixModal')">Cancel</button>
-                <button class="btn-primary" id="fixBtn" onclick="runFixUrls()">Fix URLs</button>
-            </div>
-        </div>
-    </div>
-    
     <script>
         let page = 1, sortCol = 'post_date', sortDir = 'desc', searchTimeout, checkInterval;
+        
+        // Subreddit tags management
+        function getSubreddits() {
+            const stored = localStorage.getItem('subreddits');
+            if (!stored) return ['SideProject'];
+            try { return JSON.parse(stored); } catch { return ['SideProject']; }
+        }
+        
+        function saveSubreddits(subs) {
+            localStorage.setItem('subreddits', JSON.stringify(subs));
+        }
+        
+        function renderSubredditTags() {
+            const container = document.getElementById('subredditTags');
+            const subs = getSubreddits();
+            if (subs.length === 0) {
+                container.innerHTML = '<div class="empty-tags">No subreddits added. Add one above!</div>';
+                return;
+            }
+            container.innerHTML = subs.map(sub => `
+                <span class="tag">
+                    <span class="tag-prefix">r/</span>${sub}
+                    <button class="tag-remove" onclick="removeSubreddit('${sub}')" title="Remove">×</button>
+                </span>
+            `).join('');
+        }
+        
+        function addSubreddit() {
+            const input = document.getElementById('newSubredditInput');
+            let sub = input.value.trim();
+            if (!sub) return;
+            
+            // Clean: remove r/ prefix if user added it
+            sub = sub.replace(/^r\//, '').replace(/\s+/g, '');
+            
+            const subs = getSubreddits();
+            if (subs.includes(sub)) {
+                showAlert('Subreddit already added!', 'error');
+                return;
+            }
+            
+            subs.push(sub);
+            saveSubreddits(subs);
+            renderSubredditTags();
+            input.value = '';
+            input.focus();
+            showAlert(`r/${sub} added!`, 'success');
+        }
+        
+        function removeSubreddit(sub) {
+            const subs = getSubreddits().filter(s => s !== sub);
+            saveSubreddits(subs);
+            renderSubredditTags();
+            showAlert(`r/${sub} removed`, 'success');
+        }
         
         document.addEventListener('DOMContentLoaded', loadData);
         
@@ -290,16 +350,30 @@
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         
-        function openSettings() { document.getElementById('subredditsInput').value = localStorage.getItem('subreddits') || 'SideProject'; openModal('settingsModal'); }
-        function saveSettings() { localStorage.setItem('subreddits', document.getElementById('subredditsInput').value); closeModal('settingsModal'); showAlert('Settings saved!', 'success'); }
+        function openSettings() { 
+            renderSubredditTags();
+            openModal('settingsModal'); 
+            document.getElementById('newSubredditInput').focus();
+        }
         
-        function openFetchModal() { document.getElementById('progressSection').style.display = 'none'; document.getElementById('progressLog').innerHTML = ''; document.getElementById('startFetchBtn').disabled = false; openModal('fetchModal'); }
+        function openFetchModal() { 
+            document.getElementById('progressSection').style.display = 'none'; 
+            document.getElementById('progressLog').innerHTML = ''; 
+            document.getElementById('startFetchBtn').disabled = false; 
+            openModal('fetchModal'); 
+        }
         function toggleDaysInput() { document.getElementById('daysGroup').style.display = document.getElementById('fetchMode').value === 'backfill' ? 'block' : 'none'; }
         
         async function startFetch() {
             const mode = document.getElementById('fetchMode').value;
             const days = document.getElementById('fetchDays').value;
-            const subs = (localStorage.getItem('subreddits') || 'SideProject').split(',').map(s => s.trim());
+            const subs = getSubreddits();
+            
+            if (subs.length === 0) {
+                showAlert('Add at least one subreddit in Settings!', 'error');
+                return;
+            }
+            
             document.getElementById('progressSection').style.display = 'block';
             document.getElementById('startFetchBtn').disabled = true;
             try {
@@ -345,22 +419,6 @@
                 const r = await fetch(`/api/urls/${id}`, { method: 'DELETE' });
                 if (r.ok) { closeModal('deleteModal'); showAlert('URL deleted!', 'success'); loadData(); } else { showAlert('Error deleting', 'error'); }
             } catch (e) { showAlert('Error: ' + e.message, 'error'); }
-        }
-        
-        function openFixModal() { document.getElementById('fixResult').style.display = 'none'; document.getElementById('fixBtn').disabled = false; document.getElementById('fixBtn').textContent = 'Fix URLs'; openModal('fixModal'); }
-        async function runFixUrls() {
-            document.getElementById('fixBtn').disabled = true;
-            document.getElementById('fixBtn').textContent = 'Fixing...';
-            try {
-                const r = await fetch('/api/urls/fix-malformed', { method: 'POST' });
-                const d = await r.json();
-                const result = document.getElementById('fixResult');
-                result.style.display = 'block';
-                result.innerHTML = d.error ? `<span style="color:var(--danger)">Error: ${d.error}</span>` : `<span style="color:var(--success)">✅ Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid</span>`;
-                if (!d.error) loadData();
-            } catch (e) { document.getElementById('fixResult').innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`; document.getElementById('fixResult').style.display = 'block'; }
-            document.getElementById('fixBtn').disabled = false;
-            document.getElementById('fixBtn').textContent = 'Fix URLs';
         }
         
         function showAlert(msg, type) { const a = document.createElement('div'); a.className = `alert alert-${type}`; a.textContent = msg; document.body.appendChild(a); setTimeout(() => a.remove(), 4000); }
