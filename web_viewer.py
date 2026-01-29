@@ -1,28 +1,16 @@
 #!/usr/bin/env python3
-
 from flask import Flask, render_template, jsonify, request, Response
-from database import Database
-from datetime import datetime
-import os
-import sys
-import subprocess
 import threading
-import time
-import io
-import csv
+import subprocess
+from database import Database
 
 app = Flask(__name__)
 
 scrape_state = {
     'running': False,
-    'progress': 0,
-    'current_sub': '',
-    'total_subs': 0,
-    'completed_subs': 0,
+    'log': [],
     'urls_found': 0,
-    'started_at': None,
-    'error': None,
-    'log': []
+    'error': None
 }
 
 @app.route('/')
@@ -38,51 +26,20 @@ def get_stats():
 
 @app.route('/api/urls')
 def get_urls():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 50))
-    subreddit = request.args.get('subreddit', None)
-    search = request.args.get('search', None)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+    search = request.args.get('search', '')
+    subreddit = request.args.get('subreddit', '')
     
     db = Database()
-    cursor = db.conn.cursor()
-    
-    conditions = []
-    params = []
-    
-    if subreddit:
-        conditions.append("subreddit = ?")
-        params.append(subreddit)
-    
-    if search:
-        conditions.append("(url LIKE ? OR subreddit LIKE ?)")
-        params.extend([f'%{search}%', f'%{search}%'])
-    
-    where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
-    
-    cursor.execute(f"SELECT COUNT(*) as count FROM urls {where}", params)
-    total = cursor.fetchone()['count']
-    
-    query = f
-    params.extend([per_page, (page - 1) * per_page])
-    cursor.execute(query, params)
-    urls = [dict(row) for row in cursor.fetchall()]
-    
+    result = db.get_urls(page=page, per_page=per_page, search=search if search else None, subreddit=subreddit if subreddit else None)
     db.close()
-    
-    return jsonify({
-        'urls': urls,
-        'page': page,
-        'per_page': per_page,
-        'total': total,
-        'pages': max(1, (total + per_page - 1) // per_page)
-    })
+    return jsonify(result)
 
 @app.route('/api/subreddits')
 def get_subreddits():
     db = Database()
-    cursor = db.conn.cursor()
-    cursor.execute()
-    subreddits = [dict(row) for row in cursor.fetchall()]
+    subreddits = db.get_subreddits()
     db.close()
     return jsonify(subreddits)
 
@@ -98,114 +55,82 @@ def run_scraper():
         return jsonify({'error': 'Already running'}), 400
     
     data = request.json
-    subreddits = data.get('subreddits', [])
     mode = data.get('mode', 'daily')
     days = data.get('days', 7)
+    subreddits = data.get('subreddits', ['SideProject'])
     
-    if not subreddits:
-        return jsonify({'error': 'No subreddits configured'}), 400
-    
-    def run():
+    def run_in_thread():
         global scrape_state
-        scrape_state = {
-            'running': True,
-            'progress': 0,
-            'current_sub': '',
-            'total_subs': len(subreddits),
-            'completed_subs': 0,
-            'urls_found': 0,
-            'started_at': datetime.now().isoformat(),
-            'error': None,
-            'log': [f"Starting scrape: {len(subreddits)} subreddit(s), mode={mode}, days={days}"]
-        }
+        scrape_state = {'running': True, 'log': [], 'urls_found': 0, 'error': None}
         
         try:
-            venv_python = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                'venv', 'bin', 'python'
+            cmd = ['python', 'reddit_scraper_noauth.py']
+            if mode == 'backfill':
+                cmd.extend(['--backfill', str(days)])
+            else:
+                cmd.append('--daily')
+            cmd.extend(['--subreddits'] + subreddits)
+            
+            scrape_state['log'].append(f"Running: {' '.join(cmd)}")
+            
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1
             )
-            python_cmd = venv_python if os.path.exists(venv_python) else sys.executable
             
-            db = Database()
-            cursor = db.conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM urls")
-            initial_count = cursor.fetchone()[0]
-            db.close()
+            for line in process.stdout:
+                line = line.strip()
+                if line:
+                    scrape_state['log'].append(line)
+                    if 'new URLs' in line.lower() or 'urls found' in line.lower():
+                        try:
+                            import re
+                            nums = re.findall(r'\d+', line)
+                            if nums:
+                                scrape_state['urls_found'] = int(nums[0])
+                        except:
+                            pass
             
-            for i, sub in enumerate(subreddits):
-                scrape_state['current_sub'] = sub
-                scrape_state['progress'] = int((i / len(subreddits)) * 100)
-                scrape_state['log'].append(f"📡 Scraping r/{sub}...")
-                
-                cmd = [python_cmd, 'reddit_scraper_noauth.py']
-                if mode == 'daily':
-                    cmd.append('--daily')
-                else:
-                    cmd.extend(['--backfill', str(days)])
-                cmd.extend(['--subreddits', sub])
-                
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    cwd=os.path.dirname(os.path.abspath(__file__)),
-                    timeout=600
-                )
-                
-                scrape_state['completed_subs'] = i + 1
-                
-                output = result.stdout if result.stdout else ""
-                if result.returncode != 0:
-                    error_msg = result.stderr[:300] if result.stderr else "Unknown error"
-                    scrape_state['log'].append(f"⚠️ Error on r/{sub}: {error_msg}")
-                else:
-                    for line in output.split('\n'):
-                        if '✅' in line or '⚠️' in line:
-                            scrape_state['log'].append(line.strip())
-                            break
-                    else:
-                        scrape_state['log'].append(f"✓ Completed r/{sub}")
-                
-                time.sleep(2)
+            process.wait()
             
-            db = Database()
-            cursor = db.conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM urls")
-            final_count = cursor.fetchone()[0]
-            db.close()
+            if process.returncode != 0:
+                scrape_state['error'] = f'Process exited with code {process.returncode}'
             
-            scrape_state['urls_found'] = final_count - initial_count
-            scrape_state['progress'] = 100
-            scrape_state['log'].append(f"✅ Done! Found {scrape_state['urls_found']} new URLs")
+            scrape_state['log'].append("Completed!")
             
-        except subprocess.TimeoutExpired:
-            scrape_state['error'] = "Timeout"
-            scrape_state['log'].append("❌ Timeout")
         except Exception as e:
             scrape_state['error'] = str(e)
-            scrape_state['log'].append(f"❌ Error: {str(e)}")
+            scrape_state['log'].append(f"Error: {str(e)}")
         finally:
             scrape_state['running'] = False
     
-    thread = threading.Thread(target=run)
+    thread = threading.Thread(target=run_in_thread)
+    thread.daemon = True
     thread.start()
     
-    return jsonify({'message': 'Started', 'total': len(subreddits)})
+    return jsonify({'status': 'started'})
 
 @app.route('/api/export')
 def export_csv():
     db = Database()
-    cursor = db.conn.cursor()
-    cursor.execute("SELECT url, post_date, subreddit, post_id FROM urls ORDER BY post_date DESC")
+    import io
+    import csv
     
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['url', 'post_date', 'subreddit', 'post_id'])
+    
+    cursor = db.conn.cursor()
+    cursor.execute("SELECT url, post_date, subreddit, post_id FROM urls ORDER BY post_date DESC")
     for row in cursor.fetchall():
         writer.writerow([row['url'], row['post_date'], row['subreddit'], row['post_id']])
     
     db.close()
     
+    output.seek(0)
     return Response(
         output.getvalue(),
         mimetype='text/csv',
@@ -213,8 +138,8 @@ def export_csv():
     )
 
 if __name__ == '__main__':
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("🔗 Reddit URL Scraper")
-    print("="*50)
+    print("=" * 50)
     print("\n🚀 http://localhost:3010\n")
-    app.run(debug=True, host='0.0.0.0', port=3010)
+    app.run(host='0.0.0.0', port=3010, debug=True)
