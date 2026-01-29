@@ -265,7 +265,12 @@
         
         async function loadStats() {
             try {
-                const r = await fetch('/api/stats');
+                const sub = document.getElementById('filterSub').value;
+                const search = document.getElementById('searchInput').value;
+                const params = new URLSearchParams();
+                if (sub) params.append('subreddit', sub);
+                if (search) params.append('search', search);
+                const r = await fetch('/api/stats?' + params.toString());
                 const d = await r.json();
                 document.getElementById('statTotal').textContent = d.total_urls.toLocaleString();
                 document.getElementById('statSubs').textContent = d.subreddits;
@@ -288,6 +293,8 @@
         
         async function loadURLs(p = 1) {
             page = p;
+            loadStats();  // Reload stats with current filters
+            loadStats();  // Reload stats with current filters
             const search = document.getElementById('searchInput').value;
             const sub = document.getElementById('filterSub').value;
             const perPage = document.getElementById('perPage').value;

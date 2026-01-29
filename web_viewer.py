@@ -28,8 +28,13 @@ def index():
 
 @app.route('/api/stats')
 def get_stats():
+    subreddit = request.args.get('subreddit', '')
+    search = request.args.get('search', '')
     db = Database()
-    stats = db.get_stats()
+    stats = db.get_stats(
+        subreddit=subreddit if subreddit else None,
+        search=search if search else None
+    )
     db.close()
     return jsonify(stats)
 

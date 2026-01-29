@@ -78,13 +78,25 @@ class Database:
                 writer.writerow([row['url'], row['post_date'], row['subreddit'], row['post_id']])
         return len(rows)
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self, subreddit: str = None, search: str = None) -> Dict[str, Any]:
         cursor = self.conn.cursor()
-        cursor.execute("SELECT COUNT(*) as total FROM urls")
+        
+        # Build WHERE clause for filters
+        where_clauses = []
+        params = []
+        if subreddit:
+            where_clauses.append("subreddit = ?")
+            params.append(subreddit)
+        if search:
+            where_clauses.append("(url LIKE ? OR post_id LIKE ?)")
+            params.extend([f'%{search}%', f'%{search}%'])
+        where_sql = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+        
+        cursor.execute(f"SELECT COUNT(*) as total FROM urls{where_sql}", params)
         total = cursor.fetchone()['total']
-        cursor.execute("SELECT COUNT(DISTINCT subreddit) as subs FROM urls")
+        cursor.execute(f"SELECT COUNT(DISTINCT subreddit) as subs FROM urls{where_sql}", params)
         subs = cursor.fetchone()['subs']
-        cursor.execute("SELECT MIN(post_date) as oldest, MAX(post_date) as newest FROM urls")
+        cursor.execute(f"SELECT MIN(post_date) as oldest, MAX(post_date) as newest FROM urls{where_sql}", params)
         row = cursor.fetchone()
         return {
             'total_urls': total,
