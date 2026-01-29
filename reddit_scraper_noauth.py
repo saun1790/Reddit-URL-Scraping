@@ -61,6 +61,10 @@ class RedditURLScraperNoAuth:
             url = url.split('!')[0]
             url = url.rstrip('.,;:!?)]\'"<>')
             
+            # Add http:// to www URLs that don't have a protocol
+            if url.startswith('www.'):
+                url = 'http://' + url
+            
             if url.startswith('http') and not self._is_reddit_url(url):
                 normalized.add(url)
         
