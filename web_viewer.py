@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 import os
+import sys
 from flask import Flask, render_template, jsonify, request, Response
 import threading
 import subprocess
 from database import Database
 
 # Change to script directory to find database
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(SCRIPT_DIR)
+
+# Get Python executable from same venv
+PYTHON_EXE = sys.executable
 
 app = Flask(__name__)
 
@@ -68,7 +73,8 @@ def run_scraper():
         scrape_state = {'running': True, 'log': [], 'urls_found': 0, 'error': None}
         
         try:
-            cmd = ['python', 'reddit_scraper_noauth.py']
+            scraper_path = os.path.join(SCRIPT_DIR, 'reddit_scraper_noauth.py')
+            cmd = [PYTHON_EXE, scraper_path]
             if mode == 'backfill':
                 cmd.extend(['--backfill', str(days)])
             else:
@@ -82,7 +88,8 @@ def run_scraper():
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1
+                bufsize=1,
+                cwd=SCRIPT_DIR
             )
             
             for line in process.stdout:
