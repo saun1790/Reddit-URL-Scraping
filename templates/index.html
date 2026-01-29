@@ -24,7 +24,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
         h1 { font-size: 24px; }
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -33,9 +33,10 @@
         .btn-warning { background: var(--warning); color: #000; }
         .btn-ghost { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--border); }
-        .btn-sm { padding: 4px 8px; font-size: 12px; background: var(--card-bg); border: 1px solid var(--border); }
+        .btn-sm { padding: 6px 10px; font-size: 14px; background: var(--card-bg); border: 1px solid var(--border); line-height: 1; }
         .btn-sm:hover { background: var(--primary); color: #fff; }
-        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .btn-danger:hover { background: #d73a49; }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
         .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
@@ -46,16 +47,20 @@
         #searchInput { width: 300px; }
         .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
         th { background: var(--bg); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
         th:hover { color: var(--primary); }
         tr:hover { background: rgba(88, 166, 255, 0.1); }
-        td a { color: var(--primary); text-decoration: none; word-break: break-all; }
+        .col-url { width: 50%; }
+        .col-date { width: 150px; white-space: nowrap; }
+        .col-sub { width: 120px; }
+        .col-post { width: 80px; }
+        .col-actions { width: 90px; }
+        td a { color: var(--primary); text-decoration: none; word-break: break-all; display: block; }
         td a:hover { text-decoration: underline; }
-        .badge { background: var(--border); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .badge { background: var(--border); padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-block; }
         code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-        .actions { white-space: nowrap; }
-        .actions button { margin-right: 4px; }
+        .actions { display: flex; gap: 6px; align-items: center; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
         .pagination button { min-width: 36px; height: 36px; padding: 0; }
         .pagination button.active { background: var(--primary); color: #fff; }
@@ -239,22 +244,23 @@
         
         function renderTable(urls) {
             let html = `<table><thead><tr>
-                <th onclick="toggleSort('url')">URL ${getSortIcon('url')}</th>
-                <th onclick="toggleSort('post_date')">Date ${getSortIcon('post_date')}</th>
-                <th onclick="toggleSort('subreddit')">Subreddit ${getSortIcon('subreddit')}</th>
-                <th>Post ID</th><th>Actions</th>
+                <th class="col-url" onclick="toggleSort('url')">URL ${getSortIcon('url')}</th>
+                <th class="col-date" onclick="toggleSort('post_date')">Date ${getSortIcon('post_date')}</th>
+                <th class="col-sub" onclick="toggleSort('subreddit')">Subreddit ${getSortIcon('subreddit')}</th>
+                <th class="col-post">Post ID</th>
+                <th class="col-actions">Actions</th>
             </tr></thead><tbody>`;
             urls.forEach(u => {
                 const esc = u.url.replace(/'/g, "\\'");
                 html += `<tr>
-                    <td><a href="${u.url}" target="_blank">${u.url}</a></td>
-                    <td>${formatDateTime(u.post_date)}</td>
+                    <td><a href="${u.url}" target="_blank" title="${u.url}">${u.url}</a></td>
+                    <td class="col-date">${formatDateTime(u.post_date)}</td>
                     <td><span class="badge">r/${u.subreddit}</span></td>
                     <td><code>${u.post_id}</code></td>
-                    <td class="actions">
-                        <button class="btn-sm" onclick="openEditModal(${u.id}, '${esc}')">✏️</button>
-                        <button class="btn-sm btn-danger" onclick="openDeleteModal(${u.id}, '${esc}')">🗑️</button>
-                    </td>
+                    <td><div class="actions">
+                        <button class="btn-sm" onclick="openEditModal(${u.id}, '${esc}')" title="Edit">✏️</button>
+                        <button class="btn-sm btn-danger" onclick="openDeleteModal(${u.id}, '${esc}')" title="Delete">🗑️</button>
+                    </div></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -275,7 +281,11 @@
         
         function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => loadURLs(1), 300); }
         function formatDate(d) { return d ? new Date(d).toLocaleDateString() : '-'; }
-        function formatDateTime(d) { return d ? new Date(d).toLocaleString() : '-'; }
+        function formatDateTime(d) { 
+            if (!d) return '-';
+            const dt = new Date(d);
+            return dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
         
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
