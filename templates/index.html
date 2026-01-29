@@ -25,202 +25,60 @@
             padding: 20px;
         }
         .container { max-width: 1400px; margin: 0 auto; }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        h1 { font-size: 24px; display: flex; align-items: center; gap: 10px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        h1 { font-size: 24px; }
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
+        button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: #4c8ed9; }
         .btn-warning { background: var(--warning); color: #000; }
-        .btn-warning:hover { background: #b8860b; }
         .btn-ghost { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
         .btn-ghost:hover { background: var(--border); }
         .btn-sm { padding: 4px 8px; font-size: 12px; background: var(--card-bg); border: 1px solid var(--border); }
         .btn-sm:hover { background: var(--primary); color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: #d73a49; }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat {
-            background: var(--card-bg);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
         .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
         .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-        
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        input, select {
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--card-bg);
-            color: var(--text);
-            font-size: 14px;
-        }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        .filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+        input, select, textarea { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); color: var(--text); font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
         #searchInput { width: 300px; }
-        
-        .table-container {
-            background: var(--card-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            overflow-x: auto;
-        }
+        .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        th {
-            background: var(--bg);
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
         th:hover { color: var(--primary); }
-        th.sorted-asc::after { content: ' ↑'; }
-        th.sorted-desc::after { content: ' ↓'; }
         tr:hover { background: rgba(88, 166, 255, 0.1); }
         td a { color: var(--primary); text-decoration: none; word-break: break-all; }
         td a:hover { text-decoration: underline; }
-        .badge {
-            background: var(--border);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-        }
-        code { 
-            background: var(--bg); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-size: 12px;
-        }
+        .badge { background: var(--border); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
         .actions { white-space: nowrap; }
         .actions button { margin-right: 4px; }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .pagination button {
-            min-width: 36px;
-            height: 36px;
-            padding: 0;
-        }
-        .pagination button.active {
-            background: var(--primary);
-            color: #fff;
-        }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .pagination button { min-width: 36px; height: 36px; padding: 0; }
+        .pagination button.active { background: var(--primary); color: #fff; }
         .page-info { color: var(--text-muted); font-size: 14px; }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal.show { display: flex; }
-        .modal-content {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            max-width: 500px;
-            width: 90%;
-        }
+        .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border); max-width: 500px; width: 90%; }
         .modal h2 { margin-bottom: 16px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); }
-        .form-group input, .form-group select { width: 100%; }
-        
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; }
+        .form-group textarea { min-height: 80px; resize: vertical; font-family: monospace; }
+        .alert { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease; }
         .alert-success { background: var(--success); color: #fff; }
         .alert-error { background: var(--danger); color: #fff; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .progress-section { margin: 16px 0; }
-        .progress-bar-bg {
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-        .progress-log {
-            margin-top: 12px;
-            background: var(--bg);
-            padding: 12px;
-            border-radius: 6px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-        }
-        .progress-log div { margin: 2px 0; }
+        .progress-bar-bg { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); transition: width 0.3s; }
+        .progress-info { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; color: var(--text-muted); }
+        .progress-log { margin-top: 12px; background: var(--bg); padding: 12px; border-radius: 6px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+        .confirm-msg { margin: 16px 0; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -229,57 +87,36 @@
             <h1>🔗 Reddit URL Scraper</h1>
             <div class="header-actions">
                 <button class="btn-ghost" onclick="openSettings()">⚙️ Settings</button>
-                <button class="btn-ghost" onclick="fixMalformedUrls()">🔧 Fix URLs</button>
+                <button class="btn-ghost" onclick="openFixModal()">🔧 Fix URLs</button>
                 <button class="btn-warning" onclick="openFetchModal()">⚡ Fetch URLs</button>
                 <a href="/api/export"><button class="btn-ghost">📥 Export CSV</button></a>
             </div>
         </header>
-        
         <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="statTotal">0</div>
-                <div class="stat-label">Total URLs</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="statSubs">0</div>
-                <div class="stat-label">Subreddits</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="statOldest">-</div>
-                <div class="stat-label">Oldest</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="statNewest">-</div>
-                <div class="stat-label">Newest</div>
-            </div>
+            <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total URLs</div></div>
+            <div class="stat"><div class="stat-value" id="statSubs">0</div><div class="stat-label">Subreddits</div></div>
+            <div class="stat"><div class="stat-value" id="statOldest">-</div><div class="stat-label">Oldest</div></div>
+            <div class="stat"><div class="stat-value" id="statNewest">-</div><div class="stat-label">Newest</div></div>
         </div>
-        
         <div class="filters">
             <input type="text" id="searchInput" placeholder="Search URLs..." onkeyup="debounceSearch()">
-            <select id="filterSub" onchange="loadURLs(1)">
-                <option value="">All Subreddits</option>
-            </select>
+            <select id="filterSub" onchange="loadURLs(1)"><option value="">All Subreddits</option></select>
             <select id="perPage" onchange="loadURLs(1)">
                 <option value="25">25 per page</option>
                 <option value="50" selected>50 per page</option>
                 <option value="100">100 per page</option>
             </select>
         </div>
-        
-        <div class="table-container">
-            <div id="urlsTable"></div>
-        </div>
-        
+        <div class="table-container"><div id="urlsTable"></div></div>
         <div class="pagination" id="pagination"></div>
     </div>
     
-    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <h2>⚙️ Settings</h2>
             <div class="form-group">
                 <label>Subreddits (comma separated)</label>
-                <input type="text" id="subredditsInput" placeholder="SideProject, startups, entrepreneur">
+                <input type="text" id="subredditsInput" placeholder="SideProject, startups">
             </div>
             <div class="modal-actions">
                 <button class="btn-ghost" onclick="closeModal('settingsModal')">Cancel</button>
@@ -288,7 +125,6 @@
         </div>
     </div>
     
-    <!-- Fetch Modal -->
     <div class="modal" id="fetchModal">
         <div class="modal-content">
             <h2>⚡ Fetch URLs</h2>
@@ -304,13 +140,8 @@
                 <input type="number" id="fetchDays" value="30" min="1" max="180">
             </div>
             <div class="progress-section" id="progressSection" style="display:none">
-                <div class="progress-bar-bg">
-                    <div class="progress-bar" id="progressBar" style="width:0%"></div>
-                </div>
-                <div class="progress-info">
-                    <span id="progressText">Starting...</span>
-                    <span id="progressPercent">0%</span>
-                </div>
+                <div class="progress-bar-bg"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+                <div class="progress-info"><span id="progressText">Starting...</span><span id="progressPercent">0%</span></div>
                 <div class="progress-log" id="progressLog"></div>
             </div>
             <div class="modal-actions">
@@ -320,19 +151,52 @@
         </div>
     </div>
     
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h2>✏️ Edit URL</h2>
+            <input type="hidden" id="editUrlId">
+            <div class="form-group">
+                <label>URL</label>
+                <textarea id="editUrlInput" placeholder="https://example.com"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveEditUrl()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h2>🗑️ Delete URL</h2>
+            <input type="hidden" id="deleteUrlId">
+            <p class="confirm-msg">Are you sure you want to delete this URL?</p>
+            <p id="deleteUrlPreview" style="word-break:break-all; color:var(--text-muted); font-size:12px;"></p>
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="btn-danger" onclick="confirmDeleteUrl()">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="fixModal">
+        <div class="modal-content">
+            <h2>🔧 Fix Malformed URLs</h2>
+            <p class="confirm-msg">This will automatically fix URLs with malformed markdown patterns and remove invalid entries.</p>
+            <div id="fixResult" style="display:none; margin-top:16px; padding:12px; background:var(--bg); border-radius:6px;"></div>
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="closeModal('fixModal')">Cancel</button>
+                <button class="btn-primary" id="fixBtn" onclick="runFixUrls()">Fix URLs</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        let page = 1;
-        let sortCol = 'post_date';
-        let sortDir = 'desc';
-        let searchTimeout;
-        let checkInterval;
+        let page = 1, sortCol = 'post_date', sortDir = 'desc', searchTimeout, checkInterval;
         
-        // Load on start
         document.addEventListener('DOMContentLoaded', loadData);
         
-        async function loadData() {
-            await Promise.all([loadStats(), loadSubreddits(), loadURLs(1)]);
-        }
+        async function loadData() { await Promise.all([loadStats(), loadSubreddits(), loadURLs(1)]); }
         
         async function loadStats() {
             try {
@@ -342,7 +206,7 @@
                 document.getElementById('statSubs').textContent = d.subreddits;
                 document.getElementById('statOldest').textContent = formatDate(d.oldest_post);
                 document.getElementById('statNewest').textContent = formatDate(d.newest_post);
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
         
         async function loadSubreddits() {
@@ -352,11 +216,9 @@
                 const select = document.getElementById('filterSub');
                 const val = select.value;
                 select.innerHTML = '<option value="">All Subreddits</option>';
-                d.forEach(s => {
-                    select.innerHTML += `<option value="${s.name}">r/${s.name} (${s.count})</option>`;
-                });
+                d.forEach(s => { select.innerHTML += `<option value="${s.name}">r/${s.name} (${s.count})</option>`; });
                 select.value = val;
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
         
         async function loadURLs(p = 1) {
@@ -364,250 +226,137 @@
             const search = document.getElementById('searchInput').value;
             const sub = document.getElementById('filterSub').value;
             const perPage = document.getElementById('perPage').value;
-            
             const params = new URLSearchParams({ page: p, per_page: perPage });
             if (search) params.append('search', search);
             if (sub) params.append('subreddit', sub);
-            
             try {
                 const r = await fetch(`/api/urls?${params}`);
                 const d = await r.json();
                 renderTable(d.urls);
                 renderPagination(d.page, d.pages, d.total);
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
         
         function renderTable(urls) {
-            let html = `<table>
-                <thead><tr>
-                    <th onclick="toggleSort('url')">URL ${getSortIcon('url')}</th>
-                    <th onclick="toggleSort('post_date')">Date ${getSortIcon('post_date')}</th>
-                    <th onclick="toggleSort('subreddit')">Subreddit ${getSortIcon('subreddit')}</th>
-                    <th>Post ID</th>
-                    <th>Actions</th>
-                </tr></thead>
-                <tbody>`;
-            
+            let html = `<table><thead><tr>
+                <th onclick="toggleSort('url')">URL ${getSortIcon('url')}</th>
+                <th onclick="toggleSort('post_date')">Date ${getSortIcon('post_date')}</th>
+                <th onclick="toggleSort('subreddit')">Subreddit ${getSortIcon('subreddit')}</th>
+                <th>Post ID</th><th>Actions</th>
+            </tr></thead><tbody>`;
             urls.forEach(u => {
-                const escapedUrl = u.url.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const esc = u.url.replace(/'/g, "\\'");
                 html += `<tr>
                     <td><a href="${u.url}" target="_blank">${u.url}</a></td>
                     <td>${formatDateTime(u.post_date)}</td>
                     <td><span class="badge">r/${u.subreddit}</span></td>
                     <td><code>${u.post_id}</code></td>
                     <td class="actions">
-                        <button class="btn-sm" onclick="editUrl(${u.id}, '${escapedUrl}')">✏️</button>
-                        <button class="btn-sm btn-danger" onclick="deleteUrl(${u.id})">🗑️</button>
+                        <button class="btn-sm" onclick="openEditModal(${u.id}, '${esc}')">✏️</button>
+                        <button class="btn-sm btn-danger" onclick="openDeleteModal(${u.id}, '${esc}')">🗑️</button>
                     </td>
                 </tr>`;
             });
-            
             html += '</tbody></table>';
             document.getElementById('urlsTable').innerHTML = html;
         }
         
-        function getSortIcon(col) {
-            if (sortCol !== col) return '';
-            return sortDir === 'asc' ? '↑' : '↓';
-        }
-        
-        function toggleSort(col) {
-            if (sortCol === col) {
-                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortCol = col;
-                sortDir = 'desc';
-            }
-            loadURLs(page);
-        }
+        function getSortIcon(col) { return sortCol !== col ? '' : (sortDir === 'asc' ? '↑' : '↓'); }
+        function toggleSort(col) { sortDir = (sortCol === col) ? (sortDir === 'asc' ? 'desc' : 'asc') : 'desc'; sortCol = col; loadURLs(page); }
         
         function renderPagination(current, total, totalItems) {
-            const container = document.getElementById('pagination');
-            let html = '';
-            
-            html += `<span class="page-info">${totalItems.toLocaleString()} URLs</span>`;
-            
-            if (current > 1) {
-                html += `<button class="btn-ghost" onclick="loadURLs(1)">«</button>`;
-                html += `<button class="btn-ghost" onclick="loadURLs(${current-1})">‹</button>`;
-            }
-            
-            const start = Math.max(1, current - 2);
-            const end = Math.min(total, current + 2);
-            
-            for (let i = start; i <= end; i++) {
-                html += `<button class="btn-ghost ${i === current ? 'active' : ''}" onclick="loadURLs(${i})">${i}</button>`;
-            }
-            
-            if (current < total) {
-                html += `<button class="btn-ghost" onclick="loadURLs(${current+1})">›</button>`;
-                html += `<button class="btn-ghost" onclick="loadURLs(${total})">»</button>`;
-            }
-            
+            let html = `<span class="page-info">${totalItems.toLocaleString()} URLs</span>`;
+            if (current > 1) { html += `<button class="btn-ghost" onclick="loadURLs(1)">«</button><button class="btn-ghost" onclick="loadURLs(${current-1})">‹</button>`; }
+            for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) { html += `<button class="btn-ghost ${i === current ? 'active' : ''}" onclick="loadURLs(${i})">${i}</button>`; }
+            if (current < total) { html += `<button class="btn-ghost" onclick="loadURLs(${current+1})">›</button><button class="btn-ghost" onclick="loadURLs(${total})">»</button>`; }
             html += `<span class="page-info">Page ${current} of ${total}</span>`;
-            container.innerHTML = html;
+            document.getElementById('pagination').innerHTML = html;
         }
         
-        function debounceSearch() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => loadURLs(1), 300);
-        }
+        function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => loadURLs(1), 300); }
+        function formatDate(d) { return d ? new Date(d).toLocaleDateString() : '-'; }
+        function formatDateTime(d) { return d ? new Date(d).toLocaleString() : '-'; }
         
-        function formatDate(d) {
-            if (!d) return '-';
-            return new Date(d).toLocaleDateString();
-        }
-        
-        function formatDateTime(d) {
-            if (!d) return '-';
-            return new Date(d).toLocaleString();
-        }
-        
-        // Modals
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        function openSettings() {
-            document.getElementById('subredditsInput').value = localStorage.getItem('subreddits') || 'SideProject';
-            openModal('settingsModal');
-        }
-        function saveSettings() {
-            localStorage.setItem('subreddits', document.getElementById('subredditsInput').value);
-            closeModal('settingsModal');
-            showAlert('Settings saved!', 'success');
-        }
-        function openFetchModal() {
-            document.getElementById('progressSection').style.display = 'none';
-            document.getElementById('progressLog').innerHTML = '';
-            openModal('fetchModal');
-        }
-        function toggleDaysInput() {
-            document.getElementById('daysGroup').style.display = 
-                document.getElementById('fetchMode').value === 'backfill' ? 'block' : 'none';
-        }
+        
+        function openSettings() { document.getElementById('subredditsInput').value = localStorage.getItem('subreddits') || 'SideProject'; openModal('settingsModal'); }
+        function saveSettings() { localStorage.setItem('subreddits', document.getElementById('subredditsInput').value); closeModal('settingsModal'); showAlert('Settings saved!', 'success'); }
+        
+        function openFetchModal() { document.getElementById('progressSection').style.display = 'none'; document.getElementById('progressLog').innerHTML = ''; document.getElementById('startFetchBtn').disabled = false; openModal('fetchModal'); }
+        function toggleDaysInput() { document.getElementById('daysGroup').style.display = document.getElementById('fetchMode').value === 'backfill' ? 'block' : 'none'; }
         
         async function startFetch() {
             const mode = document.getElementById('fetchMode').value;
             const days = document.getElementById('fetchDays').value;
             const subs = (localStorage.getItem('subreddits') || 'SideProject').split(',').map(s => s.trim());
-            
             document.getElementById('progressSection').style.display = 'block';
             document.getElementById('startFetchBtn').disabled = true;
-            
             try {
-                const r = await fetch('/api/scrape/run', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, subreddits: subs, days: parseInt(days) })
-                });
-                
-                if (r.ok) {
-                    checkProgress();
-                } else {
-                    const d = await r.json();
-                    showAlert(d.error || 'Error starting scrape', 'error');
-                    document.getElementById('startFetchBtn').disabled = false;
-                }
-            } catch (e) {
-                showAlert('Error: ' + e.message, 'error');
-                document.getElementById('startFetchBtn').disabled = false;
-            }
+                const r = await fetch('/api/scrape/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode, subreddits: subs, days: parseInt(days) }) });
+                if (r.ok) { checkProgress(); } else { const d = await r.json(); showAlert(d.error || 'Error', 'error'); document.getElementById('startFetchBtn').disabled = false; }
+            } catch (e) { showAlert('Error: ' + e.message, 'error'); document.getElementById('startFetchBtn').disabled = false; }
         }
         
         function checkProgress() {
             if (checkInterval) clearInterval(checkInterval);
-            
             checkInterval = setInterval(async () => {
                 try {
                     const r = await fetch('/api/scrape/status');
                     const s = await r.json();
-                    
-                    const progress = s.running ? 50 : 100;
-                    document.getElementById('progressBar').style.width = progress + '%';
-                    document.getElementById('progressPercent').textContent = progress + '%';
-                    document.getElementById('progressText').textContent = 
-                        s.running ? 'Processing...' : 'Done!';
-                    
-                    const log = document.getElementById('progressLog');
-                    log.innerHTML = s.log.map(l => `<div>${l}</div>`).join('');
-                    log.scrollTop = log.scrollHeight;
-                    
+                    document.getElementById('progressBar').style.width = (s.running ? 50 : 100) + '%';
+                    document.getElementById('progressPercent').textContent = (s.running ? 50 : 100) + '%';
+                    document.getElementById('progressText').textContent = s.running ? 'Processing...' : 'Done!';
+                    document.getElementById('progressLog').innerHTML = s.log.map(l => `<div>${l}</div>`).join('');
                     if (!s.running) {
                         clearInterval(checkInterval);
                         document.getElementById('startFetchBtn').disabled = false;
-                        
-                        setTimeout(() => {
-                            closeModal('fetchModal');
-                            loadData();
-                            if (s.error) {
-                                showAlert('Error: ' + s.error, 'error');
-                            } else {
-                                showAlert(`Found ${s.urls_found} new URLs!`, 'success');
-                            }
-                        }, 1500);
+                        setTimeout(() => { closeModal('fetchModal'); loadData(); showAlert(s.error ? 'Error: ' + s.error : `Found ${s.urls_found} new URLs!`, s.error ? 'error' : 'success'); }, 1500);
                     }
-                } catch (e) { console.error(e); }
+                } catch (e) {}
             }, 1000);
         }
         
-        async function fixMalformedUrls() {
-            if (!confirm('This will fix URLs with malformed markdown patterns. Continue?')) return;
+        function openEditModal(id, url) { document.getElementById('editUrlId').value = id; document.getElementById('editUrlInput').value = url; openModal('editModal'); document.getElementById('editUrlInput').focus(); }
+        async function saveEditUrl() {
+            const id = document.getElementById('editUrlId').value;
+            const newUrl = document.getElementById('editUrlInput').value.trim();
+            if (!newUrl) { showAlert('URL cannot be empty', 'error'); return; }
+            try {
+                const r = await fetch(`/api/urls/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: newUrl }) });
+                if (r.ok) { closeModal('editModal'); showAlert('URL updated!', 'success'); loadURLs(page); } else { const d = await r.json(); showAlert(d.error || 'Error', 'error'); }
+            } catch (e) { showAlert('Error: ' + e.message, 'error'); }
+        }
+        
+        function openDeleteModal(id, url) { document.getElementById('deleteUrlId').value = id; document.getElementById('deleteUrlPreview').textContent = url; openModal('deleteModal'); }
+        async function confirmDeleteUrl() {
+            const id = document.getElementById('deleteUrlId').value;
+            try {
+                const r = await fetch(`/api/urls/${id}`, { method: 'DELETE' });
+                if (r.ok) { closeModal('deleteModal'); showAlert('URL deleted!', 'success'); loadData(); } else { showAlert('Error deleting', 'error'); }
+            } catch (e) { showAlert('Error: ' + e.message, 'error'); }
+        }
+        
+        function openFixModal() { document.getElementById('fixResult').style.display = 'none'; document.getElementById('fixBtn').disabled = false; document.getElementById('fixBtn').textContent = 'Fix URLs'; openModal('fixModal'); }
+        async function runFixUrls() {
+            document.getElementById('fixBtn').disabled = true;
+            document.getElementById('fixBtn').textContent = 'Fixing...';
             try {
                 const r = await fetch('/api/urls/fix-malformed', { method: 'POST' });
                 const d = await r.json();
-                if (d.error) {
-                    showAlert('Error: ' + d.error, 'error');
-                } else {
-                    showAlert(`Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid`, 'success');
-                    loadData();
-                }
-            } catch (e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
+                const result = document.getElementById('fixResult');
+                result.style.display = 'block';
+                result.innerHTML = d.error ? `<span style="color:var(--danger)">Error: ${d.error}</span>` : `<span style="color:var(--success)">✅ Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid</span>`;
+                if (!d.error) loadData();
+            } catch (e) { document.getElementById('fixResult').innerHTML = `<span style="color:var(--danger)">Error: ${e.message}</span>`; document.getElementById('fixResult').style.display = 'block'; }
+            document.getElementById('fixBtn').disabled = false;
+            document.getElementById('fixBtn').textContent = 'Fix URLs';
         }
         
-        async function editUrl(id, currentUrl) {
-            const newUrl = prompt('Edit URL:', currentUrl);
-            if (!newUrl || newUrl === currentUrl) return;
-            try {
-                const r = await fetch(`/api/urls/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: newUrl })
-                });
-                if (r.ok) {
-                    showAlert('URL updated!', 'success');
-                    loadURLs(page);
-                } else {
-                    const d = await r.json();
-                    showAlert(d.error || 'Error updating', 'error');
-                }
-            } catch (e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
-        }
+        function showAlert(msg, type) { const a = document.createElement('div'); a.className = `alert alert-${type}`; a.textContent = msg; document.body.appendChild(a); setTimeout(() => a.remove(), 4000); }
         
-        async function deleteUrl(id) {
-            if (!confirm('Delete this URL?')) return;
-            try {
-                const r = await fetch(`/api/urls/${id}`, { method: 'DELETE' });
-                if (r.ok) {
-                    showAlert('URL deleted!', 'success');
-                    loadData();
-                } else {
-                    showAlert('Error deleting', 'error');
-                }
-            } catch (e) {
-                showAlert('Error: ' + e.message, 'error');
-            }
-        }
-        
-        function showAlert(msg, type) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = msg;
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 4000);
-        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal.show').forEach(m => m.classList.remove('show')); });
+        document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
     </script>
 </body>
 </html>
