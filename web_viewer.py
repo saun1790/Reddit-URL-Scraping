@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os
 import sys
-from flask import Flask, render_template, jsonify, request, Response
+import functools
+from flask import Flask, render_template, jsonify, request, Response, session, redirect, url_for
 import threading
 import subprocess
 from database import Database
@@ -14,7 +15,46 @@ os.chdir(SCRIPT_DIR)
 PYTHON_EXE = sys.executable
 
 app = Flask(__name__)
+app.secret_key = 'reddit-scraper-secret-key-2026'
 
+# ============================================
+# AUTHENTICATION
+# ============================================
+USERS = {
+    'admin': 'gwF1cZePMdTFd4Ls'
+}
+
+def login_required(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            if request.is_json or request.path.startswith('/api/'):
+                return jsonify({'error': 'Unauthorized'}), 401
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        if username in USERS and USERS[username] == password:
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('index'))
+        error = 'Invalid credentials'
+    return render_template('login.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+# ============================================
+# MAIN ROUTES (Protected)
+# ============================================
 scrape_state = {
     'running': False,
     'log': [],
@@ -23,10 +63,12 @@ scrape_state = {
 }
 
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/api/stats')
+@login_required
 def get_stats():
     subreddit = request.args.get('subreddit', '')
     search = request.args.get('search', '')
@@ -39,6 +81,7 @@ def get_stats():
     return jsonify(stats)
 
 @app.route('/api/urls')
+@login_required
 def get_urls():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -53,6 +96,7 @@ def get_urls():
     return jsonify(result)
 
 @app.route('/api/subreddits')
+@login_required
 def get_subreddits():
     db = Database()
     subreddits = db.get_subreddits()
@@ -60,10 +104,12 @@ def get_subreddits():
     return jsonify(subreddits)
 
 @app.route('/api/scrape/status')
+@login_required
 def scrape_status():
     return jsonify(scrape_state)
 
 @app.route('/api/scrape/run', methods=['POST'])
+@login_required
 def run_scraper():
     global scrape_state
     
@@ -132,6 +178,7 @@ def run_scraper():
     return jsonify({'status': 'started'})
 
 @app.route('/api/export')
+@login_required
 def export_csv():
     db = Database()
     import io
@@ -156,6 +203,7 @@ def export_csv():
     )
 
 @app.route('/api/urls/<int:url_id>', methods=['PUT'])
+@login_required
 def update_url(url_id):
     data = request.json
     new_url = data.get('url')
@@ -174,6 +222,7 @@ def update_url(url_id):
     return jsonify({'success': True})
 
 @app.route('/api/urls/<int:url_id>', methods=['DELETE'])
+@login_required
 def delete_url(url_id):
     db = Database()
     cursor = db.conn.cursor()
@@ -187,6 +236,7 @@ def delete_url(url_id):
     return jsonify({'success': True})
 
 @app.route('/api/urls/fix-malformed', methods=['POST'])
+@login_required
 def fix_malformed_urls():
     import sqlite3
     conn = sqlite3.connect('reddit_urls.db', timeout=30)
@@ -194,7 +244,6 @@ def fix_malformed_urls():
     cursor = conn.cursor()
     
     try:
-        # Find malformed URLs (contain ]( pattern from bad markdown parsing)
         cursor.execute("SELECT id, url, subreddit, post_id FROM urls WHERE url LIKE '%](%'")
         rows = cursor.fetchall()
         
@@ -209,18 +258,15 @@ def fix_malformed_urls():
                     clean_url = parts[1].rstrip(')')
                     clean_url = clean_url.split(')')[0].split('<')[0].split('!')[0]
                     if clean_url.startswith('http'):
-                        # Check if cleaned URL already exists
                         cursor.execute(
                             "SELECT id FROM urls WHERE url = ? AND subreddit = ? AND post_id = ?",
                             (clean_url, row['subreddit'], row['post_id'])
                         )
                         existing = cursor.fetchone()
                         if existing:
-                            # Delete duplicate
                             cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
                             deleted += 1
                         else:
-                            # Update to clean URL
                             cursor.execute("UPDATE urls SET url = ? WHERE id = ?", (clean_url, row['id']))
                             fixed += 1
                     else:
@@ -242,5 +288,6 @@ if __name__ == '__main__':
     print("\n" + "=" * 50)
     print("🔗 Reddit URL Scraper")
     print("=" * 50)
-    print("\n🚀 http://localhost:3010\n")
+    print("\n🔐 Login: admin / gwF1cZePMdTFd4Ls")
+    print("🚀 http://localhost:3010\n")
     app.run(host='0.0.0.0', port=3010, debug=True)
