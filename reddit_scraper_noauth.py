@@ -13,7 +13,22 @@ class RedditURLScraperNoAuth:
     
     
     URL_PATTERN = re.compile(
-        r'https?://[^\s<>"\x27\[\]\\\x00-\x1f]+'
+        r'(?:https?://|www\.)[^\s<>"\x27\[\]\\\x00-\x1f]+'
+    )
+    
+    # Pattern for bare domains like "domain.com" without http or www
+    BARE_DOMAIN_PATTERN = re.compile(
+        r'\b([a-zA-Z0-9][-a-zA-Z0-9]*\.(?:com|net|org|io|co|app|dev|ai|xyz|me|info|biz|tech|site|online|store|shop|club|gg|tv|cc|us|uk|de|fr|es|it|nl|ca|au|in|br|mx|jp|cn|ru|kr|pl|se|no|dk|fi|at|ch|be|ie|pt|cz|hu|ro|gr|tr|za|nz|sg|hk|tw|my|ph|id|th|vn|ae|sa|eg|ng|ke|gh|pk|bd|lk|np)(?:/[a-zA-Z0-9._/-]*)?)\b'
+    )
+    
+    # Pattern for bare domains like "domain.com" without http or www
+    BARE_DOMAIN_PATTERN = re.compile(
+        r'\b([a-zA-Z0-9][-a-zA-Z0-9]*\.(?:com|net|org|io|co|app|dev|ai|xyz|me|info|biz|tech|site|online|store|shop|club|gg|tv|cc|us|uk|de|fr|es|it|nl|ca|au|in|br|mx|jp|cn|ru|kr|pl|se|no|dk|fi|at|ch|be|ie|pt|cz|hu|ro|gr|tr|za|nz|sg|hk|tw|my|ph|id|th|vn|ae|sa|eg|ng|ke|gh|pk|bd|lk|np)(?:/[a-zA-Z0-9._/-]*)?)\b'
+    )
+    
+    # Pattern for bare domains like "domain.com" without http or www
+    BARE_DOMAIN_PATTERN = re.compile(
+        r'\b([a-zA-Z0-9][-a-zA-Z0-9]*\.(?:com|net|org|io|co|app|dev|ai|xyz|me|info|biz|tech|site|online|store|shop|club|gg|tv|cc|us|uk|de|fr|es|it|nl|ca|au|in|br|mx|jp|cn|ru|kr|pl|se|no|dk|fi|at|ch|be|ie|pt|cz|hu|ro|gr|tr|za|nz|sg|hk|tw|my|ph|id|th|vn|ae|sa|eg|ng|ke|gh|pk|bd|lk|np)(?:/[a-zA-Z0-9._/-]*)?)\b'
     )
     
     REDDIT_DOMAINS = {
@@ -44,6 +59,23 @@ class RedditURLScraperNoAuth:
             return set()
         
         urls = self.URL_PATTERN.findall(text)
+        
+        # Also find bare domains like "domain.com"
+        bare_domains = self.BARE_DOMAIN_PATTERN.findall(text)
+        urls.extend(bare_domains)
+        
+        # Also find bare domains like "domain.com"
+        bare_domains = self.BARE_DOMAIN_PATTERN.findall(text)
+        urls.extend(bare_domains)
+        
+        # Also find bare domains like "domain.com"
+        bare_domains = self.BARE_DOMAIN_PATTERN.findall(text)
+        urls.extend(bare_domains)
+        
+        # Also find bare domains like "domain.com"
+        bare_domains = self.BARE_DOMAIN_PATTERN.findall(text)
+        urls.extend(bare_domains)
+        
         normalized = set()
         
         for url in urls:
@@ -61,8 +93,8 @@ class RedditURLScraperNoAuth:
             url = url.split('!')[0]
             url = url.rstrip('.,;:!?)]\'"<>')
             
-            # Add http:// to www URLs that don't have a protocol
-            if url.startswith('www.'):
+            # Add http:// to URLs that don't have a protocol
+            if not url.startswith('http'):
                 url = 'http://' + url
             
             if url.startswith('http') and not self._is_reddit_url(url):
