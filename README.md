@@ -25,18 +25,43 @@ Professional tool to extract external URLs from Reddit subreddit posts. Includes
 
 ## Installation
 
-### 1. Install Dependencies
+### Linux / macOS
 
 ```bash
-cd reddit_scraper
+mkdir ~/projects
+cd ~/projects
+git clone https://github.com/saun1790/Reddit-URL-Scraping.git
+cd Reddit-URL-Scraping
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. No API Keys Required
+### Windows (PowerShell)
 
-This scraper uses Reddit's public API without authentication.
+```powershell
+mkdir C:\projects
+cd C:\projects
+git clone https://github.com/saun1790/Reddit-URL-Scraping.git
+cd Reddit-URL-Scraping
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Windows (CMD)
+
+```cmd
+mkdir C:\projects
+cd C:\projects
+git clone https://github.com/saun1790/Reddit-URL-Scraping.git
+cd Reddit-URL-Scraping
+python -m venv venv
+venv\Scripts\activate.bat
+pip install -r requirements.txt
+```
+
+**Note:** No API keys required. This scraper uses Reddit's public API without authentication.
 
 ---
 
@@ -44,11 +69,19 @@ This scraper uses Reddit's public API without authentication.
 
 ### Option 1: Web Dashboard (Recommended)
 
-**Start the server:**
+**Linux / macOS:**
 
 ```bash
-cd reddit_scraper
+cd ~/projects/Reddit-URL-Scraping
 source venv/bin/activate
+python web_viewer.py
+```
+
+**Windows:**
+
+```powershell
+cd C:\projects\Reddit-URL-Scraping
+venv\Scripts\activate
 python web_viewer.py
 ```
 
@@ -71,33 +104,37 @@ http://localhost:3010
 
 ### Option 2: Command Line
 
-**Initial backfill (6 months of data):**
+**Linux / macOS:**
 
 ```bash
+cd ~/projects/Reddit-URL-Scraping
+source venv/bin/activate
+
 python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject
-```
 
-**Daily update (new posts only):**
-
-```bash
 python reddit_scraper_noauth.py --daily --subreddits SideProject
-```
 
-**Multiple subreddits:**
-
-```bash
 python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups entrepreneur
-```
 
-**Export to CSV:**
-
-```bash
 python reddit_scraper_noauth.py --export output.csv
+
+python reddit_scraper_noauth.py --stats
 ```
 
-**Show statistics:**
+**Windows:**
 
-```bash
+```powershell
+cd C:\projects\Reddit-URL-Scraping
+venv\Scripts\activate
+
+python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject
+
+python reddit_scraper_noauth.py --daily --subreddits SideProject
+
+python reddit_scraper_noauth.py --backfill 90 --subreddits SideProject startups entrepreneur
+
+python reddit_scraper_noauth.py --export output.csv
+
 python reddit_scraper_noauth.py --stats
 ```
 
