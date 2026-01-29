@@ -35,7 +35,10 @@ class Database:
         cursor = self.conn.cursor()
         
         try:
-            cursor.execute(, (url, subreddit, post_id, post_date))
+            cursor.execute("""
+                INSERT INTO urls (url, subreddit, post_id, post_date) 
+                VALUES (?, ?, ?, ?)
+            """, (url, subreddit, post_id, post_date))
             
             self.conn.commit()
             return True
