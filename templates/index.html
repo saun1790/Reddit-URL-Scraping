@@ -38,6 +38,10 @@
         .btn-sm:hover { background: var(--primary); color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
         .btn-danger:hover { background: #d73a49; }
+        .btn-icon { padding: 6px 8px; background: transparent; border: 1px solid var(--border); font-size: 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .btn-icon:hover { background: var(--border); }
+        .btn-icon.delete:hover { background: rgba(248, 81, 73, 0.15); border-color: var(--danger); }
+        .btn-icon.edit:hover { background: rgba(88, 166, 255, 0.15); border-color: var(--primary); }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
         .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
@@ -326,8 +330,8 @@
                     <td><span class="badge">r/${u.subreddit}</span></td>
                     <td><code>${u.post_id}</code></td>
                     <td><div class="actions">
-                        <button class="btn-sm" onclick="openEditModal(${u.id}, '${esc}')" title="Edit">✏️</button>
-                        <button class="btn-sm btn-danger" onclick="openDeleteModal(${u.id}, '${esc}')" title="Delete">🗑️</button>
+                        <button class="btn-icon edit" onclick="openEditModal(${u.id}, '${esc}')" title="Edit">✏️</button>
+                        <button class="btn-icon delete" onclick="openDeleteModal(${u.id}, '${esc}')" title="Delete">🗑️</button>
                     </div></td>
                 </tr>`;
             });
