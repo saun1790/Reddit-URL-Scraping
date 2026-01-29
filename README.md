@@ -82,7 +82,9 @@ python web_viewer.py
 ```bash
 cd ~/projects/Reddit-URL-Scraping
 source venv/bin/activate
+
 nohup python web_viewer.py > web_viewer.log 2>&1 &
+
 echo $! > web_viewer.pid
 ```
 
@@ -96,7 +98,9 @@ kill $(cat web_viewer.pid)
 
 ```bash
 kill $(cat web_viewer.pid)
+
 nohup python web_viewer.py > web_viewer.log 2>&1 &
+
 echo $! > web_viewer.pid
 ```
 
