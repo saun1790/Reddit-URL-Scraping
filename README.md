@@ -69,7 +69,7 @@ pip install -r requirements.txt
 
 ### Option 1: Web Dashboard (Recommended)
 
-**Linux / macOS:**
+**Linux / macOS - Foreground (blocks terminal):**
 
 ```bash
 cd ~/projects/Reddit-URL-Scraping
@@ -77,12 +77,55 @@ source venv/bin/activate
 python web_viewer.py
 ```
 
-**Windows:**
+**Linux / macOS - Background:**
+
+```bash
+cd ~/projects/Reddit-URL-Scraping
+source venv/bin/activate
+nohup python web_viewer.py > web_viewer.log 2>&1 &
+echo $! > web_viewer.pid
+```
+
+**Stop server:**
+
+```bash
+kill $(cat web_viewer.pid)
+```
+
+**Restart server:**
+
+```bash
+kill $(cat web_viewer.pid)
+nohup python web_viewer.py > web_viewer.log 2>&1 &
+echo $! > web_viewer.pid
+```
+
+**Windows - Foreground:**
 
 ```powershell
 cd C:\projects\Reddit-URL-Scraping
 venv\Scripts\activate
 python web_viewer.py
+```
+
+**Windows - Background (PowerShell):**
+
+```powershell
+cd C:\projects\Reddit-URL-Scraping
+Start-Process -NoNewWindow -FilePath "venv\Scripts\python.exe" -ArgumentList "web_viewer.py" -RedirectStandardOutput "web_viewer.log" -RedirectStandardError "web_viewer_error.log"
+```
+
+**Stop server (PowerShell):**
+
+```powershell
+Stop-Process -Name python -Force
+```
+
+**Restart server (PowerShell):**
+
+```powershell
+Stop-Process -Name python -Force
+Start-Process -NoNewWindow -FilePath "venv\Scripts\python.exe" -ArgumentList "web_viewer.py" -RedirectStandardOutput "web_viewer.log" -RedirectStandardError "web_viewer_error.log"
 ```
 
 **Open in browser:**
