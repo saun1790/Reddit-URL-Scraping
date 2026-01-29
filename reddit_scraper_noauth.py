@@ -296,7 +296,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='Reddit URL Scraper - Multi-endpoint for maximum historical data',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=
+        epilog=""
     )
     
     parser.add_argument('--backfill', type=int, metavar='DAYS',
