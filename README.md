@@ -196,3 +196,162 @@ chmod +x ./venv/bin/python
 ## License
 
 MIT
+
+## Linux Service (systemd)
+
+Create a systemd service to run the web dashboard automatically on boot.
+
+### 1. Create Service File
+
+```bash
+sudo nano /etc/systemd/system/reddit-scraper.service
+```
+
+Paste the following (adjust paths and user):
+
+```ini
+[Unit]
+Description=Reddit URL Scraper Web Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/Reddit-URL-Scraping
+ExecStart=/home/YOUR_USERNAME/Reddit-URL-Scraping/venv/bin/python web_viewer.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> **Note:** Replace `YOUR_USERNAME` with your actual username and adjust paths if needed.
+
+### 2. Enable and Start
+
+```bash
+# Reload systemd
+sudo systemctl daemon-reload
+
+# Enable on boot
+sudo systemctl enable reddit-scraper
+
+# Start service
+sudo systemctl start reddit-scraper
+```
+
+### 3. Service Commands
+
+| Command | Description |
+|---------|-------------|
+| `sudo systemctl start reddit-scraper` | Start the service |
+| `sudo systemctl stop reddit-scraper` | Stop the service |
+| `sudo systemctl restart reddit-scraper` | Restart the service |
+| `sudo systemctl status reddit-scraper` | Check status |
+| `sudo journalctl -u reddit-scraper -f` | View live logs |
+| `sudo journalctl -u reddit-scraper --since today` | Today's logs |
+
+### 4. Optional: Daily Scraper Service (Timer)
+
+Create a timer to run the scraper daily:
+
+```bash
+sudo nano /etc/systemd/system/reddit-scraper-daily.service
+```
+
+```ini
+[Unit]
+Description=Reddit URL Scraper Daily Fetch
+After=network.target
+
+[Service]
+Type=oneshot
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/Reddit-URL-Scraping
+ExecStart=/home/YOUR_USERNAME/Reddit-URL-Scraping/venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
+```
+
+Create the timer:
+
+```bash
+sudo nano /etc/systemd/system/reddit-scraper-daily.timer
+```
+
+```ini
+[Unit]
+Description=Run Reddit Scraper Daily at 9 AM
+
+[Timer]
+OnCalendar=*-*-* 09:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable the timer:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable reddit-scraper-daily.timer
+sudo systemctl start reddit-scraper-daily.timer
+
+# Check timer status
+systemctl list-timers | grep reddit
+```
+
+### Quick Setup Script
+
+Save this as `install-service.sh` and run with `sudo`:
+
+```bash
+#!/bin/bash
+set -e
+
+# Configuration
+USER=$(whoami)
+APP_DIR=$(pwd)
+
+echo "📦 Installing Reddit Scraper service..."
+echo "   User: $USER"
+echo "   Directory: $APP_DIR"
+
+# Create web dashboard service
+cat > /etc/systemd/system/reddit-scraper.service << SERVICEEOF
+[Unit]
+Description=Reddit URL Scraper Web Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=$APP_DIR
+ExecStart=$APP_DIR/venv/bin/python web_viewer.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+SERVICEEOF
+
+# Reload and enable
+systemctl daemon-reload
+systemctl enable reddit-scraper
+systemctl start reddit-scraper
+
+echo "✅ Service installed!"
+echo ""
+echo "Commands:"
+echo "  sudo systemctl status reddit-scraper"
+echo "  sudo systemctl restart reddit-scraper"
+echo "  sudo journalctl -u reddit-scraper -f"
+```
+
+Run:
+```bash
+chmod +x install-service.sh
+sudo ./install-service.sh
+```
