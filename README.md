@@ -88,6 +88,30 @@ nohup python web_viewer.py > web_viewer.log 2>&1 &
 echo $! > web_viewer.pid
 ```
 
+**Linux / macOS - Background with log rotation (recommended):**
+
+```bash
+cd ~/projects/Reddit-URL-Scraping
+source venv/bin/activate
+
+nohup python web_viewer.py 2>&1 | rotatelogs web_viewer_%Y%m%d.log 86400 &
+
+echo $! > web_viewer.pid
+```
+
+**Or truncate log daily (simpler):**
+
+```bash
+cd ~/projects/Reddit-URL-Scraping
+source venv/bin/activate
+
+(while true; do > web_viewer.log; sleep 86400; done) &
+
+nohup python web_viewer.py > web_viewer.log 2>&1 &
+
+echo $! > web_viewer.pid
+```
+
 **Stop server:**
 
 ```bash
@@ -116,13 +140,23 @@ python web_viewer.py
 
 ```powershell
 cd C:\projects\Reddit-URL-Scraping
-Start-Process -NoNewWindow -FilePath "venv\Scripts\python.exe" -ArgumentList "web_viewer.py" -RedirectStandardOutput "web_viewer.log" -RedirectStandardError "web_viewer_error.log"
+
+$logPath = "web_viewer.log"
+$maxLogSize = 10MB
+
+if (Test-Path $logPath) {
+    if ((Get-Item $logPath).Length -gt $maxLogSize) {
+        Remove-Item $logPath
+    }
+}
+
+Start-Process -NoNewWindow -FilePath "venv\Scripts\python.exe" -ArgumentList "web_viewer.py" -RedirectStandardOutput $logPath -RedirectStandardError "web_viewer_error.log"
 ```
 
 **Stop server (PowerShell):**
 
 ```powershell
-Stop-Process -Name python -Force
+Get-Process python | Where-Object {$_.MainWindowTitle -eq ""} | Stop-Process
 ```
 
 **Restart server (PowerShell):**
