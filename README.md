@@ -2,6 +2,17 @@
 
 Extract external URLs from Reddit subreddit posts. Includes web dashboard and historical backfill up to 6 months.
 
+## Technologies
+
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| **Backend** | Python 3.8+ | Main programming language |
+| **Web Framework** | Flask | Lightweight web server for dashboard |
+| **Database** | SQLite | Local database, no server required |
+| **Reddit Data** | Reddit Public API | No authentication required, uses JSON endpoints |
+| **Frontend** | HTML5 / CSS3 / JavaScript | Single-page dashboard with vanilla JS |
+| **HTTP Client** | Requests | Python library for API calls |
+
 ## Features
 
 - Backfill mode: Extract posts from last N days (up to 180 days)
