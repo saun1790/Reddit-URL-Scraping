@@ -93,7 +93,7 @@ class Database:
             'newest_post': row['newest']
         }
     
-    def get_urls(self, page: int = 1, per_page: int = 50, subreddit: str = None, search: str = None):
+    def get_urls(self, page: int = 1, per_page: int = 50, subreddit: str = None, search: str = None, sort: str = 'post_date', order: str = 'desc'):
         cursor = self.conn.cursor()
         offset = (page - 1) * per_page
         where_clauses = []
@@ -105,10 +105,17 @@ class Database:
             where_clauses.append("(url LIKE ? OR post_id LIKE ?)")
             params.extend([f'%{search}%', f'%{search}%'])
         where_sql = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
+        
+        # Validate sort column to prevent SQL injection
+        valid_columns = ['url', 'post_date', 'subreddit', 'post_id']
+        if sort not in valid_columns:
+            sort = 'post_date'
+        order_dir = 'ASC' if order.lower() == 'asc' else 'DESC'
+        
         cursor.execute(f"SELECT COUNT(*) as total FROM urls{where_sql}", params)
         total = cursor.fetchone()['total']
         cursor.execute(f"""
-            SELECT * FROM urls{where_sql} ORDER BY post_date DESC LIMIT ? OFFSET ?
+            SELECT * FROM urls{where_sql} ORDER BY {sort} {order_dir} LIMIT ? OFFSET ?
         """, params + [per_page, offset])
         rows = cursor.fetchall()
         return {

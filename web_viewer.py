@@ -39,9 +39,11 @@ def get_urls():
     per_page = request.args.get('per_page', 50, type=int)
     search = request.args.get('search', '')
     subreddit = request.args.get('subreddit', '')
+    sort = request.args.get('sort', 'post_date')
+    order = request.args.get('order', 'desc')
     
     db = Database()
-    result = db.get_urls(page=page, per_page=per_page, search=search if search else None, subreddit=subreddit if subreddit else None)
+    result = db.get_urls(page=page, per_page=per_page, search=search if search else None, subreddit=subreddit if subreddit else None, sort=sort, order=order)
     db.close()
     return jsonify(result)
 

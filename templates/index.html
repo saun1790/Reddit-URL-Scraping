@@ -291,7 +291,7 @@
             const search = document.getElementById('searchInput').value;
             const sub = document.getElementById('filterSub').value;
             const perPage = document.getElementById('perPage').value;
-            const params = new URLSearchParams({ page: p, per_page: perPage });
+            const params = new URLSearchParams({ page: p, per_page: perPage, sort: sortCol, order: sortDir });
             if (search) params.append('search', search);
             if (sub) params.append('subreddit', sub);
             try {
