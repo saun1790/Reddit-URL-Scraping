@@ -4,706 +4,334 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reddit URL Scraper</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --bg: #09090b;
-            --bg-card: #18181b;
-            --bg-hover: #27272a;
-            --border: #27272a;
-            --text: #fafafa;
-            --text-muted: #a1a1aa;
-            --primary: #3b82f6;
-            --primary-hover: #60a5fa;
-            --success: #22c55e;
-            --warning: #eab308;
-            --danger: #ef4444;
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --primary: #58a6ff;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
         }
-        
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
+            padding: 20px;
         }
-        
-        .app { max-width: 1600px; margin: 0 auto; padding: 24px; }
-        
-        /* Header */
-        .header {
+        .container { max-width: 1400px; margin: 0 auto; }
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
+        h1 { font-size: 24px; display: flex; align-items: center; gap: 10px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: #4c8ed9; }
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-warning:hover { background: #b8860b; }
+        .btn-ghost { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--border); }
+        .btn-sm { padding: 4px 8px; font-size: 12px; background: var(--card-bg); border: 1px solid var(--border); }
+        .btn-sm:hover { background: var(--primary); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #d73a49; }
         
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo h1 { font-size: 24px; font-weight: 700; }
-        .logo span { font-size: 28px; }
-        
-        .header-actions { display: flex; gap: 12px; }
-        
-        /* Stats Grid */
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
-        
-        @media (max-width: 900px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-        }
-        
         .stat {
-            background: var(--bg-card);
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            text-align: center;
         }
+        .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         
-        .stat-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-        }
-        
-        .stat-value.small { font-size: 16px; }
-        
-        /* Main Panel */
-        .panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .panel-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        
-        .panel-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        /* Toolbar */
-        .toolbar {
+        .filters {
             display: flex;
             gap: 12px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
             align-items: center;
         }
-        
         input, select {
-            background: var(--bg);
+            padding: 8px 12px;
             border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
             color: var(--text);
-            padding: 10px 14px;
-            border-radius: 8px;
             font-size: 14px;
-            font-family: inherit;
         }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        #searchInput { width: 300px; }
         
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        input::placeholder { color: var(--text-muted); }
-        
-        .search { width: 280px; }
-        
-        /* Buttons */
-        button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 16px;
+        .table-container {
+            background: var(--card-bg);
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-        
-        button:hover { background: var(--primary-hover); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .btn-ghost {
-            background: transparent;
             border: 1px solid var(--border);
-            color: var(--text);
-        }
-        .btn-ghost:hover { background: var(--bg-hover); }
-        
-        .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); color: #000; }
-        .btn-danger { background: var(--danger); }
-        .btn-sm { padding: 4px 8px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; background: var(--card-bg); }
-        .btn-sm:hover { background: var(--primary); }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-danger:hover { background: #c82333; }
-        
-        /* Table */
-        .table-wrap {
             overflow-x: auto;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
         }
-        
         th {
             background: var(--bg);
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
             cursor: pointer;
             user-select: none;
-            position: relative;
-            transition: all 0.2s;
-        }
-        
-        th:hover {
-            background: var(--bg-hover);
-            color: var(--text);
-        }
-        
-        th.sortable::after {
-            content: ' ⇅';
-            opacity: 0.3;
-            font-size: 10px;
-            margin-left: 6px;
-        }
-        
-        th.sort-asc::after {
-            content: ' ↑';
-            opacity: 1;
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        th.sort-desc::after {
-            content: ' ↓';
-            opacity: 1;
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        th .resizer {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 5px;
-            cursor: col-resize;
-            user-select: none;
-            z-index: 1;
-        }
-        
-        th .resizer:hover {
-            background: var(--primary);
-        }
-        
-        th[data-col="url"] { width: 45%; }
-        th[data-col="date"] { width: 20%; }
-        th[data-col="subreddit"] { width: 20%; }
-        th[data-col="postid"] { width: 15%; }
-        
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-        
-        tr:hover { background: var(--bg-hover); }
-        
-        .url-cell {
-            max-width: 500px;
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
-        a { color: var(--primary); text-decoration: none; }
-        a:hover { color: var(--primary-hover); text-decoration: underline; }
-        
+        th:hover { color: var(--primary); }
+        th.sorted-asc::after { content: ' ↑'; }
+        th.sorted-desc::after { content: ' ↓'; }
+        tr:hover { background: rgba(88, 166, 255, 0.1); }
+        td a { color: var(--primary); text-decoration: none; word-break: break-all; }
+        td a:hover { text-decoration: underline; }
         .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 999px;
+            background: var(--border);
+            padding: 2px 8px;
+            border-radius: 12px;
             font-size: 12px;
-            font-weight: 500;
-            color: var(--primary);
         }
-        
-        code {
-            font-family: 'SF Mono', Monaco, monospace;
+        code { 
+            background: var(--bg); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
             font-size: 12px;
-            color: var(--text-muted);
         }
-        
-        /* Pagination */
-        .panel-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
+        .actions { white-space: nowrap; }
+        .actions button { margin-right: 4px; }
         
         .pagination {
             display: flex;
-            gap: 8px;
+            justify-content: center;
             align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
         }
-        
         .pagination button {
-            padding: 8px 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
+            min-width: 36px;
+            height: 36px;
+            padding: 0;
         }
-        
-        .pagination button:hover:not(:disabled) { background: var(--bg-hover); }
-        .pagination .current { 
-            padding: 8px 16px;
-            color: var(--text-muted);
-            font-size: 14px;
+        .pagination button.active {
+            background: var(--primary);
+            color: #fff;
         }
+        .page-info { color: var(--text-muted); font-size: 14px; }
         
-        .page-info {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-        
-        /* Empty State */
-        .empty {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        
-        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty h3 { color: var(--text); font-size: 18px; margin-bottom: 8px; }
-        
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 60px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
-        }
-        
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Progress Modal */
         .modal {
             display: none;
             position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.active { display: flex; }
-        
-        .modal-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 500px;
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h2 { font-size: 18px; }
-        
-        .modal-body { padding: 20px; }
-        
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        
-        .close-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-        }
-        
-        .close-btn:hover { color: var(--text); }
-        
-        /* Form */
-        .form-group { margin-bottom: 20px; }
-        
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-        }
-        
-        .form-group input,
-        .form-group select {
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal h2 { margin-bottom: 16px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); }
+        .form-group input, .form-group select { width: 100%; }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .alert-success { background: var(--success); color: #fff; }
+        .alert-error { background: var(--danger); color: #fff; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
-        /* Progress */
-        .progress-section {
-            margin-top: 20px;
-        }
-        
+        .progress-section { margin: 16px 0; }
         .progress-bar-bg {
-            background: var(--bg);
-            border-radius: 999px;
             height: 8px;
+            background: var(--border);
+            border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 12px;
         }
-        
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--success));
-            border-radius: 999px;
+            background: var(--primary);
             transition: width 0.3s;
         }
-        
         .progress-info {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
+            margin-top: 8px;
+            font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 16px;
         }
-        
         .progress-log {
+            margin-top: 12px;
             background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             padding: 12px;
+            border-radius: 6px;
             max-height: 200px;
             overflow-y: auto;
-            font-size: 13px;
-            font-family: 'SF Mono', Monaco, monospace;
+            font-family: monospace;
+            font-size: 12px;
         }
-        
-        .progress-log div {
-            padding: 4px 0;
-            color: var(--text-muted);
-        }
-        
-        .progress-log div:last-child {
-            color: var(--text);
-        }
-        
-        /* Subreddit Tags */
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        
-        .tag-remove {
-            background: none;
-            border: none;
-            color: var(--danger);
-            padding: 0;
-            cursor: pointer;
-            font-size: 14px;
-            line-height: 1;
-        }
-        
-        .tag-remove:hover { color: #ff6b6b; }
-        
-        /* Status Alert */
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin: 20px;
-            margin-top: 0;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .alert.show { display: block; }
-        
-        .alert.info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: var(--primary);
-        }
-        
-        .alert.success {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: var(--success);
-        }
-        
-        .alert.error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--danger);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 16px; align-items: flex-start; }
-            .toolbar { width: 100%; }
-            .search { width: 100%; }
-            .panel-footer { flex-direction: column; align-items: stretch; }
-        }
+        .progress-log div { margin: 2px 0; }
     </style>
 </head>
 <body>
-    <div class="app">
-        <header class="header">
-            <div class="logo">
-                <span>🔗</span>
-                <h1>Reddit URL Scraper</h1>
-            </div>
+    <div class="container">
+        <header>
+            <h1>🔗 Reddit URL Scraper</h1>
             <div class="header-actions">
                 <button class="btn-ghost" onclick="openSettings()">⚙️ Settings</button>
-                <button class="btn-warning" id="fetchBtn" onclick="openFetchModal()">⚡ Fetch URLs</button>
                 <button class="btn-ghost" onclick="fixMalformedUrls()">🔧 Fix URLs</button>
+                <button class="btn-warning" onclick="openFetchModal()">⚡ Fetch URLs</button>
                 <a href="/api/export"><button class="btn-ghost">📥 Export CSV</button></a>
             </div>
         </header>
         
         <div class="stats">
             <div class="stat">
-                <div class="stat-label">Total URLs</div>
                 <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total URLs</div>
             </div>
             <div class="stat">
-                <div class="stat-label">Subreddits</div>
                 <div class="stat-value" id="statSubs">0</div>
+                <div class="stat-label">Subreddits</div>
             </div>
             <div class="stat">
-                <div class="stat-label">Earliest</div>
-                <div class="stat-value small" id="statEarliest">-</div>
+                <div class="stat-value" id="statOldest">-</div>
+                <div class="stat-label">Oldest</div>
             </div>
             <div class="stat">
-                <div class="stat-label">Latest</div>
-                <div class="stat-value small" id="statLatest">-</div>
+                <div class="stat-value" id="statNewest">-</div>
+                <div class="stat-label">Newest</div>
             </div>
         </div>
         
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title">Extracted URLs</span>
-                <div class="toolbar">
-                    <input type="text" class="search" id="searchInput" placeholder="🔍 Search URLs...">
-                    <select id="filterSub">
-                        <option value="">All Subreddits</option>
-                    </select>
-                    <select id="perPage">
-                        <option value="25">25</option>
-                        <option value="50" selected>50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <button class="btn-ghost" onclick="loadData()">🔄 Refresh</button>
-                </div>
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search URLs..." onkeyup="debounceSearch()">
+            <select id="filterSub" onchange="loadURLs(1)">
+                <option value="">All Subreddits</option>
+            </select>
+            <select id="perPage" onchange="loadURLs(1)">
+                <option value="25">25 per page</option>
+                <option value="50" selected>50 per page</option>
+                <option value="100">100 per page</option>
+            </select>
+        </div>
+        
+        <div class="table-container">
+            <div id="urlsTable"></div>
+        </div>
+        
+        <div class="pagination" id="pagination"></div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>⚙️ Settings</h2>
+            <div class="form-group">
+                <label>Subreddits (comma separated)</label>
+                <input type="text" id="subredditsInput" placeholder="SideProject, startups, entrepreneur">
             </div>
-            
-            <div id="alertBox" class="alert"></div>
-            
-            <div class="table-wrap">
-                <div id="content">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Loading...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="panel-footer">
-                <div class="page-info" id="pageInfo">Showing 0 of 0</div>
-                <div class="pagination" id="pagination"></div>
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="closeModal('settingsModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveSettings()">Save</button>
             </div>
         </div>
     </div>
     
     <!-- Fetch Modal -->
-    <div id="fetchModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h2>⚡ Fetch URLs</h2>
-                <button class="close-btn" onclick="closeModal('fetchModal')">×</button>
+    <div class="modal" id="fetchModal">
+        <div class="modal-content">
+            <h2>⚡ Fetch URLs</h2>
+            <div class="form-group">
+                <label>Mode</label>
+                <select id="fetchMode" onchange="toggleDaysInput()">
+                    <option value="daily">Daily (new posts only)</option>
+                    <option value="backfill">Backfill (historical)</option>
+                </select>
             </div>
-            <div class="modal-body">
-                <div id="fetchForm">
-                    <div class="form-group">
-                        <label>Mode</label>
-                        <select id="fetchMode">
-                            <option value="daily">Daily (new posts)</option>
-                            <option value="backfill">Backfill (historical)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="daysGroup" style="display:none">
-                        <label>Days to Backfill</label>
-                        <input type="number" id="fetchDays" value="90" min="1" max="365">
-                        <p style="color: var(--text-muted); font-size: 12px; margin-top: 6px;">
-                            💡 Tip: Uses multiple Reddit endpoints (new, top, hot) to maximize coverage. Can retrieve up to 3+ months of data.
-                        </p>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 16px;">
-                        Will scrape: <span id="fetchSubsPreview" style="color: var(--primary)"></span>
-                    </p>
-                </div>
-                <div id="fetchProgress" style="display:none">
-                    <div class="progress-section">
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-                        </div>
-                        <div class="progress-info">
-                            <span id="progressText">Starting...</span>
-                            <span id="progressPercent">0%</span>
-                        </div>
-                        <div class="progress-log" id="progressLog"></div>
-                    </div>
-                </div>
+            <div class="form-group" id="daysGroup" style="display:none">
+                <label>Days to backfill</label>
+                <input type="number" id="fetchDays" value="30" min="1" max="180">
             </div>
-            <div class="modal-footer" id="fetchFooter">
+            <div class="progress-section" id="progressSection" style="display:none">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+                </div>
+                <div class="progress-info">
+                    <span id="progressText">Starting...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-log" id="progressLog"></div>
+            </div>
+            <div class="modal-actions">
                 <button class="btn-ghost" onclick="closeModal('fetchModal')">Cancel</button>
-                <button class="btn-warning" id="startFetchBtn" onclick="startFetch()">Start Scraping</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h2>⚙️ Settings</h2>
-                <button class="close-btn" onclick="closeModal('settingsModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Configured Subreddits</label>
-                    <div id="subTags" class="tags"></div>
-                </div>
-                <div class="form-group">
-                    <label>Add Subreddit</label>
-                    <input type="text" id="newSubInput" placeholder="Enter name (without r/)">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-ghost" onclick="closeModal('settingsModal')">Close</button>
-                <button onclick="addSub()">Add Subreddit</button>
+                <button class="btn-warning" id="startFetchBtn" onclick="startFetch()">Start</button>
             </div>
         </div>
     </div>
     
     <script>
-        // State
         let page = 1;
-        let total = 0;
-        let subs = JSON.parse(localStorage.getItem('subs') || '["SideProject", "startups"]');
-        let checkInterval = null;
-        let searchTimeout = null;
-        let sortBy = 'post_date';
+        let sortCol = 'post_date';
         let sortDir = 'desc';
-        let currentData = [];
+        let searchTimeout;
+        let checkInterval;
         
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-            setInterval(loadData, 30000);
-            
-            document.getElementById('searchInput').addEventListener('input', e => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => loadURLs(1), 300);
-            });
-            
-            document.getElementById('filterSub').addEventListener('change', () => loadURLs(1));
-            document.getElementById('perPage').addEventListener('change', () => loadURLs(1));
-            document.getElementById('fetchMode').addEventListener('change', e => {
-                document.getElementById('daysGroup').style.display = e.target.value === 'backfill' ? 'block' : 'none';
-            });
-            
-            document.getElementById('newSubInput').addEventListener('keypress', e => {
-                if (e.key === 'Enter') addSub();
-            });
-        });
+        // Load on start
+        document.addEventListener('DOMContentLoaded', loadData);
         
-        // Data Loading
         async function loadData() {
-            await Promise.all([loadStats(), loadSubreddits(), loadURLs(page)]);
+            await Promise.all([loadStats(), loadSubreddits(), loadURLs(1)]);
         }
         
         async function loadStats() {
@@ -712,9 +340,9 @@
                 const d = await r.json();
                 document.getElementById('statTotal').textContent = d.total_urls.toLocaleString();
                 document.getElementById('statSubs').textContent = d.subreddits;
-                document.getElementById('statEarliest').textContent = formatDate(d.oldest_post);
-                document.getElementById('statLatest').textContent = formatDate(d.newest_post);
-            } catch (e) {}
+                document.getElementById('statOldest').textContent = formatDate(d.oldest_post);
+                document.getElementById('statNewest').textContent = formatDate(d.newest_post);
+            } catch (e) { console.error(e); }
         }
         
         async function loadSubreddits() {
@@ -728,57 +356,9 @@
                     select.innerHTML += `<option value="${s.name}">r/${s.name} (${s.count})</option>`;
                 });
                 select.value = val;
-            } catch (e) {}
+            } catch (e) { console.error(e); }
         }
         
-        async function fixMalformedUrls() {
-            if (!confirm("This will automatically fix URLs with malformed markdown patterns. Continue?")) return;
-            try {
-                const r = await fetch("/api/urls/fix-malformed", { method: "POST" });
-                const d = await r.json();
-                showAlert(`Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid entries`, "success");
-                loadData();
-            } catch (e) {
-                showAlert("Error: " + e.message, "error");
-            }
-        }
-
-        async function editUrl(id, currentUrl) {
-            const newUrl = prompt("Edit URL:", currentUrl);
-            if (newUrl === null || newUrl === currentUrl) return;
-            try {
-                const r = await fetch(`/api/urls/${id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ url: newUrl })
-                });
-                if (r.ok) {
-                    showAlert("URL updated!", "success");
-                    loadData();
-                } else {
-                    const d = await r.json();
-                    showAlert(d.error || "Error updating", "error");
-                }
-            } catch (e) {
-                showAlert("Error: " + e.message, "error");
-            }
-        }
-
-        async function deleteUrl(id) {
-            if (!confirm("Delete this URL?")) return;
-            try {
-                const r = await fetch(`/api/urls/${id}`, { method: "DELETE" });
-                if (r.ok) {
-                    showAlert("URL deleted!", "success");
-                    loadData();
-                } else {
-                    showAlert("Error deleting", "error");
-                }
-            } catch (e) {
-                showAlert("Error: " + e.message, "error");
-            }
-        }
-
         async function loadURLs(p = 1) {
             page = p;
             const search = document.getElementById('searchInput').value;
@@ -792,152 +372,144 @@
             try {
                 const r = await fetch(`/api/urls?${params}`);
                 const d = await r.json();
-                total = d.total;
-                currentData = d.urls;
-                sortData();
-                renderTable(currentData);
-                renderPagination(d.page, d.pages, d.total, d.per_page);
-            } catch (e) {
-                document.getElementById('content').innerHTML = '<div class="empty"><div class="empty-icon">❌</div><h3>Error</h3><p>Failed to load</p></div>';
-            }
-        }
-        
-        function sortData() {
-            currentData.sort((a, b) => {
-                let aVal = a[sortBy];
-                let bVal = b[sortBy];
-                
-                // Convert dates for comparison
-                if (sortBy === 'post_date') {
-                    aVal = new Date(aVal).getTime();
-                    bVal = new Date(bVal).getTime();
-                }
-                
-                if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
-                if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-        
-        function toggleSort(column) {
-            if (sortBy === column) {
-                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortBy = column;
-                sortDir = 'asc';
-            }
-            sortData();
-            renderTable(currentData);
+                renderTable(d.urls);
+                renderPagination(d.page, d.pages, d.total);
+            } catch (e) { console.error(e); }
         }
         
         function renderTable(urls) {
-            const content = document.getElementById('content');
-            
-            if (!urls.length) {
-                content.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>No URLs Found</h3><p>Click "Fetch URLs" to start scraping</p></div>';
-                return;
-            }
-            
-            const getSortClass = (col) => {
-                if (sortBy !== col) return 'sortable';
-                return sortDir === 'asc' ? 'sort-asc' : 'sort-desc';
-            };
-            
             let html = `<table>
                 <thead><tr>
-                    <th data-col="url" class="${getSortClass('url')}" onclick="toggleSort('url')">
-                        URL<span class="resizer" onmousedown="initResize(event, 0)"></span>
-                    </th>
-                    <th data-col="date" class="${getSortClass('post_date')}" onclick="toggleSort('post_date')">
-                        Date<span class="resizer" onmousedown="initResize(event, 1)"></span>
-                    </th>
-                    <th data-col="subreddit" class="${getSortClass('subreddit')}" onclick="toggleSort('subreddit')">
-                        Subreddit<span class="resizer" onmousedown="initResize(event, 2)"></span>
-                    </th>
-                    <th data-col="postid" class="${getSortClass('post_id')}" onclick="toggleSort('post_id')">
-                        Post ID<span class="resizer" onmousedown="initResize(event, 3)"></span>
-                    </th>
+                    <th onclick="toggleSort('url')">URL ${getSortIcon('url')}</th>
+                    <th onclick="toggleSort('post_date')">Date ${getSortIcon('post_date')}</th>
+                    <th onclick="toggleSort('subreddit')">Subreddit ${getSortIcon('subreddit')}</th>
+                    <th>Post ID</th>
+                    <th>Actions</th>
                 </tr></thead>
                 <tbody>`;
             
             urls.forEach(u => {
+                const escapedUrl = u.url.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 html += `<tr>
-                    <td class="url-cell"><a href="${u.url}" target="_blank">${u.url}</a></td>
+                    <td><a href="${u.url}" target="_blank">${u.url}</a></td>
                     <td>${formatDateTime(u.post_date)}</td>
                     <td><span class="badge">r/${u.subreddit}</span></td>
                     <td><code>${u.post_id}</code></td>
-                    <td>
-                        <button class="btn-sm" onclick="editUrl(${u.id}, '${u.url.replace(/'/g, "\\'")}')">✏️</button>
+                    <td class="actions">
+                        <button class="btn-sm" onclick="editUrl(${u.id}, '${escapedUrl}')">✏️</button>
                         <button class="btn-sm btn-danger" onclick="deleteUrl(${u.id})">🗑️</button>
                     </td>
                 </tr>`;
             });
             
             html += '</tbody></table>';
-            content.innerHTML = html;
+            document.getElementById('urlsTable').innerHTML = html;
         }
         
-        function renderPagination(current, pages, total, perPage) {
-            const start = (current - 1) * perPage + 1;
-            const end = Math.min(current * perPage, total);
+        function getSortIcon(col) {
+            if (sortCol !== col) return '';
+            return sortDir === 'asc' ? '↑' : '↓';
+        }
+        
+        function toggleSort(col) {
+            if (sortCol === col) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortCol = col;
+                sortDir = 'desc';
+            }
+            loadURLs(page);
+        }
+        
+        function renderPagination(current, total, totalItems) {
+            const container = document.getElementById('pagination');
+            let html = '';
             
-            document.getElementById('pageInfo').textContent = 
-                total > 0 ? `Showing ${start}-${end} of ${total.toLocaleString()}` : 'No results';
+            html += `<span class="page-info">${totalItems.toLocaleString()} URLs</span>`;
             
-            if (pages <= 1) {
-                document.getElementById('pagination').innerHTML = '';
-                return;
+            if (current > 1) {
+                html += `<button class="btn-ghost" onclick="loadURLs(1)">«</button>`;
+                html += `<button class="btn-ghost" onclick="loadURLs(${current-1})">‹</button>`;
             }
             
-            document.getElementById('pagination').innerHTML = `
-                <button onclick="loadURLs(1)" ${current === 1 ? 'disabled' : ''}>«</button>
-                <button onclick="loadURLs(${current - 1})" ${current === 1 ? 'disabled' : ''}>‹</button>
-                <span class="current">Page ${current} of ${pages}</span>
-                <button onclick="loadURLs(${current + 1})" ${current === pages ? 'disabled' : ''}>›</button>
-                <button onclick="loadURLs(${pages})" ${current === pages ? 'disabled' : ''}>»</button>
-            `;
+            const start = Math.max(1, current - 2);
+            const end = Math.min(total, current + 2);
+            
+            for (let i = start; i <= end; i++) {
+                html += `<button class="btn-ghost ${i === current ? 'active' : ''}" onclick="loadURLs(${i})">${i}</button>`;
+            }
+            
+            if (current < total) {
+                html += `<button class="btn-ghost" onclick="loadURLs(${current+1})">›</button>`;
+                html += `<button class="btn-ghost" onclick="loadURLs(${total})">»</button>`;
+            }
+            
+            html += `<span class="page-info">Page ${current} of ${total}</span>`;
+            container.innerHTML = html;
         }
         
-        // Fetch
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadURLs(1), 300);
+        }
+        
+        function formatDate(d) {
+            if (!d) return '-';
+            return new Date(d).toLocaleDateString();
+        }
+        
+        function formatDateTime(d) {
+            if (!d) return '-';
+            return new Date(d).toLocaleString();
+        }
+        
+        // Modals
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function openSettings() {
+            document.getElementById('subredditsInput').value = localStorage.getItem('subreddits') || 'SideProject';
+            openModal('settingsModal');
+        }
+        function saveSettings() {
+            localStorage.setItem('subreddits', document.getElementById('subredditsInput').value);
+            closeModal('settingsModal');
+            showAlert('Settings saved!', 'success');
+        }
         function openFetchModal() {
-            document.getElementById('fetchForm').style.display = 'block';
-            document.getElementById('fetchProgress').style.display = 'none';
-            document.getElementById('startFetchBtn').disabled = false;
-            document.getElementById('fetchSubsPreview').textContent = subs.map(s => 'r/' + s).join(', ');
-            document.getElementById('fetchModal').classList.add('active');
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('progressLog').innerHTML = '';
+            openModal('fetchModal');
+        }
+        function toggleDaysInput() {
+            document.getElementById('daysGroup').style.display = 
+                document.getElementById('fetchMode').value === 'backfill' ? 'block' : 'none';
         }
         
         async function startFetch() {
-            if (!subs.length) {
-                showAlert('Configure subreddits in Settings first', 'error');
-                return;
-            }
-            
             const mode = document.getElementById('fetchMode').value;
-            const days = parseInt(document.getElementById('fetchDays').value);
+            const days = document.getElementById('fetchDays').value;
+            const subs = (localStorage.getItem('subreddits') || 'SideProject').split(',').map(s => s.trim());
             
-            document.getElementById('fetchForm').style.display = 'none';
-            document.getElementById('fetchProgress').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'block';
             document.getElementById('startFetchBtn').disabled = true;
-            document.getElementById('progressLog').innerHTML = '';
             
             try {
                 const r = await fetch('/api/scrape/run', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, subreddits: subs, days })
+                    body: JSON.stringify({ mode, subreddits: subs, days: parseInt(days) })
                 });
                 
                 if (r.ok) {
                     checkProgress();
                 } else {
                     const d = await r.json();
-                    showAlert('Error: ' + d.error, 'error');
-                    closeModal('fetchModal');
+                    showAlert(d.error || 'Error starting scrape', 'error');
+                    document.getElementById('startFetchBtn').disabled = false;
                 }
             } catch (e) {
                 showAlert('Error: ' + e.message, 'error');
-                closeModal('fetchModal');
+                document.getElementById('startFetchBtn').disabled = false;
             }
         }
         
@@ -949,10 +521,11 @@
                     const r = await fetch('/api/scrape/status');
                     const s = await r.json();
                     
-                    document.getElementById('progressBar').style.width = (s.running ? 50 : 100) + '%';
-                    document.getElementById('progressPercent').textContent = (s.running ? 50 : 100) + '%';
+                    const progress = s.running ? 50 : 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    document.getElementById('progressPercent').textContent = progress + '%';
                     document.getElementById('progressText').textContent = 
-                        s.running ? `Scraping r/${(s.log && s.log.length > 0 ? "processing" : "starting")} (${s.urls_found}/${(s.log ? s.log.length : 0)})` : 'Done';
+                        s.running ? 'Processing...' : 'Done!';
                     
                     const log = document.getElementById('progressLog');
                     log.innerHTML = s.log.map(l => `<div>${l}</div>`).join('');
@@ -965,7 +538,6 @@
                         setTimeout(() => {
                             closeModal('fetchModal');
                             loadData();
-                            
                             if (s.error) {
                                 showAlert('Error: ' + s.error, 'error');
                             } else {
@@ -973,94 +545,68 @@
                             }
                         }, 1500);
                     }
-                } catch (e) {}
+                } catch (e) { console.error(e); }
             }, 1000);
         }
         
-        // Settings
-        function openSettings() {
-            renderSubTags();
-            document.getElementById('settingsModal').classList.add('active');
-        }
-        
-        function renderSubTags() {
-            document.getElementById('subTags').innerHTML = subs.map(s => 
-                `<span class="tag">r/${s} <button class="tag-remove" onclick="removeSub('${s}')">×</button></span>`
-            ).join('');
-        }
-        
-        function addSub() {
-            const input = document.getElementById('newSubInput');
-            const sub = input.value.trim().replace(/^r\//, '');
-            if (sub && !subs.includes(sub)) {
-                subs.push(sub);
-                localStorage.setItem('subs', JSON.stringify(subs));
-                renderSubTags();
-                input.value = '';
+        async function fixMalformedUrls() {
+            if (!confirm('This will fix URLs with malformed markdown patterns. Continue?')) return;
+            try {
+                const r = await fetch('/api/urls/fix-malformed', { method: 'POST' });
+                const d = await r.json();
+                if (d.error) {
+                    showAlert('Error: ' + d.error, 'error');
+                } else {
+                    showAlert(`Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid`, 'success');
+                    loadData();
+                }
+            } catch (e) {
+                showAlert('Error: ' + e.message, 'error');
             }
         }
         
-        function removeSub(sub) {
-            subs = subs.filter(s => s !== sub);
-            localStorage.setItem('subs', JSON.stringify(subs));
-            renderSubTags();
+        async function editUrl(id, currentUrl) {
+            const newUrl = prompt('Edit URL:', currentUrl);
+            if (!newUrl || newUrl === currentUrl) return;
+            try {
+                const r = await fetch(`/api/urls/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: newUrl })
+                });
+                if (r.ok) {
+                    showAlert('URL updated!', 'success');
+                    loadURLs(page);
+                } else {
+                    const d = await r.json();
+                    showAlert(d.error || 'Error updating', 'error');
+                }
+            } catch (e) {
+                showAlert('Error: ' + e.message, 'error');
+            }
         }
         
-        // Modals
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+        async function deleteUrl(id) {
+            if (!confirm('Delete this URL?')) return;
+            try {
+                const r = await fetch(`/api/urls/${id}`, { method: 'DELETE' });
+                if (r.ok) {
+                    showAlert('URL deleted!', 'success');
+                    loadData();
+                } else {
+                    showAlert('Error deleting', 'error');
+                }
+            } catch (e) {
+                showAlert('Error: ' + e.message, 'error');
+            }
         }
         
-        // Alert
         function showAlert(msg, type) {
-            const box = document.getElementById('alertBox');
-            box.textContent = msg;
-            box.className = `alert show ${type}`;
-            setTimeout(() => box.className = 'alert', 5000);
-        }
-        
-        // Formatting
-        function formatDate(d) {
-            if (!d || d === 'N/A') return '-';
-            return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-        
-        function formatDateTime(d) {
-            return new Date(d).toLocaleString('en-US', { 
-                month: 'short', day: 'numeric', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
-        }
-        
-        // Column Resizing
-        let activeResizer = null;
-        let startX = 0;
-        let startWidth = 0;
-        
-        function initResize(e, colIndex) {
-            e.stopPropagation(); // Don't trigger sort
-            activeResizer = colIndex;
-            const th = e.target.parentElement;
-            startX = e.clientX;
-            startWidth = th.offsetWidth;
-            
-            document.addEventListener('mousemove', doResize);
-            document.addEventListener('mouseup', stopResize);
-        }
-        
-        function doResize(e) {
-            if (activeResizer === null) return;
-            const table = document.querySelector('table');
-            const th = table.querySelectorAll('th')[activeResizer];
-            const diff = e.clientX - startX;
-            const newWidth = Math.max(50, startWidth + diff);
-            th.style.width = newWidth + 'px';
-        }
-        
-        function stopResize() {
-            activeResizer = null;
-            document.removeEventListener('mousemove', doResize);
-            document.removeEventListener('mouseup', stopResize);
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = msg;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
         }
     </script>
 </body>
