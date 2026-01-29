@@ -148,13 +148,6 @@ def export_csv():
         headers={'Content-Disposition': 'attachment; filename=reddit_urls.csv'}
     )
 
-if __name__ == '__main__':
-    print("\n" + "=" * 50)
-    print("🔗 Reddit URL Scraper")
-    print("=" * 50)
-    print("\n🚀 http://localhost:3010\n")
-    app.run(host='0.0.0.0', port=3010, debug=True)
-
 @app.route('/api/urls/<int:url_id>', methods=['PUT'])
 def update_url(url_id):
     data = request.json
@@ -188,37 +181,59 @@ def delete_url(url_id):
 
 @app.route('/api/urls/fix-malformed', methods=['POST'])
 def fix_malformed_urls():
-    db = Database()
-    cursor = db.conn.cursor()
+    import sqlite3
+    conn = sqlite3.connect('reddit_urls.db', timeout=30)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
     
-    # Find malformed URLs (contain ]( pattern from bad markdown parsing)
-    cursor.execute("SELECT id, url FROM urls WHERE url LIKE '%](%'")
-    rows = cursor.fetchall()
-    
-    fixed = 0
-    deleted = 0
-    
-    for row in rows:
-        url = row['url']
-        # Extract the actual URL (take the part after ]( or before ])
-        if '](http' in url:
-            # Pattern: text](https://real.url or https://url](https://url
-            parts = url.split('](')
-            if len(parts) >= 2:
-                clean_url = parts[1].rstrip(')')
-                # Remove any trailing garbage
-                clean_url = clean_url.split(')')[0].split('<')[0].split('!')[0]
-                if clean_url.startswith('http'):
-                    cursor.execute("UPDATE urls SET url = ? WHERE id = ?", (clean_url, row['id']))
-                    fixed += 1
-                else:
-                    cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
-                    deleted += 1
-        else:
-            cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
-            deleted += 1
-    
-    db.conn.commit()
-    db.close()
-    
-    return jsonify({'fixed': fixed, 'deleted': deleted})
+    try:
+        # Find malformed URLs (contain ]( pattern from bad markdown parsing)
+        cursor.execute("SELECT id, url, subreddit, post_id FROM urls WHERE url LIKE '%](%'")
+        rows = cursor.fetchall()
+        
+        fixed = 0
+        deleted = 0
+        
+        for row in rows:
+            url = row['url']
+            if '](http' in url:
+                parts = url.split('](')
+                if len(parts) >= 2:
+                    clean_url = parts[1].rstrip(')')
+                    clean_url = clean_url.split(')')[0].split('<')[0].split('!')[0]
+                    if clean_url.startswith('http'):
+                        # Check if cleaned URL already exists
+                        cursor.execute(
+                            "SELECT id FROM urls WHERE url = ? AND subreddit = ? AND post_id = ?",
+                            (clean_url, row['subreddit'], row['post_id'])
+                        )
+                        existing = cursor.fetchone()
+                        if existing:
+                            # Delete duplicate
+                            cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
+                            deleted += 1
+                        else:
+                            # Update to clean URL
+                            cursor.execute("UPDATE urls SET url = ? WHERE id = ?", (clean_url, row['id']))
+                            fixed += 1
+                    else:
+                        cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
+                        deleted += 1
+            else:
+                cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
+                deleted += 1
+        
+        conn.commit()
+        return jsonify({'fixed': fixed, 'deleted': deleted})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+if __name__ == '__main__':
+    print("\n" + "=" * 50)
+    print("🔗 Reddit URL Scraper")
+    print("=" * 50)
+    print("\n🚀 http://localhost:3010\n")
+    app.run(host='0.0.0.0', port=3010, debug=True)
