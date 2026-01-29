@@ -154,3 +154,71 @@ if __name__ == '__main__':
     print("=" * 50)
     print("\n🚀 http://localhost:3010\n")
     app.run(host='0.0.0.0', port=3010, debug=True)
+
+@app.route('/api/urls/<int:url_id>', methods=['PUT'])
+def update_url(url_id):
+    data = request.json
+    new_url = data.get('url')
+    if not new_url:
+        return jsonify({'error': 'URL required'}), 400
+    
+    db = Database()
+    cursor = db.conn.cursor()
+    cursor.execute("UPDATE urls SET url = ? WHERE id = ?", (new_url, url_id))
+    db.conn.commit()
+    affected = cursor.rowcount
+    db.close()
+    
+    if affected == 0:
+        return jsonify({'error': 'URL not found'}), 404
+    return jsonify({'success': True})
+
+@app.route('/api/urls/<int:url_id>', methods=['DELETE'])
+def delete_url(url_id):
+    db = Database()
+    cursor = db.conn.cursor()
+    cursor.execute("DELETE FROM urls WHERE id = ?", (url_id,))
+    db.conn.commit()
+    affected = cursor.rowcount
+    db.close()
+    
+    if affected == 0:
+        return jsonify({'error': 'URL not found'}), 404
+    return jsonify({'success': True})
+
+@app.route('/api/urls/fix-malformed', methods=['POST'])
+def fix_malformed_urls():
+    db = Database()
+    cursor = db.conn.cursor()
+    
+    # Find malformed URLs (contain ]( pattern from bad markdown parsing)
+    cursor.execute("SELECT id, url FROM urls WHERE url LIKE '%](%'")
+    rows = cursor.fetchall()
+    
+    fixed = 0
+    deleted = 0
+    
+    for row in rows:
+        url = row['url']
+        # Extract the actual URL (take the part after ]( or before ])
+        if '](http' in url:
+            # Pattern: text](https://real.url or https://url](https://url
+            parts = url.split('](')
+            if len(parts) >= 2:
+                clean_url = parts[1].rstrip(')')
+                # Remove any trailing garbage
+                clean_url = clean_url.split(')')[0].split('<')[0].split('!')[0]
+                if clean_url.startswith('http'):
+                    cursor.execute("UPDATE urls SET url = ? WHERE id = ?", (clean_url, row['id']))
+                    fixed += 1
+                else:
+                    cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
+                    deleted += 1
+        else:
+            cursor.execute("DELETE FROM urls WHERE id = ?", (row['id'],))
+            deleted += 1
+    
+    db.conn.commit()
+    db.close()
+    
+    return jsonify({'fixed': fixed, 'deleted': deleted})

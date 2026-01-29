@@ -161,6 +161,10 @@
         .btn-success { background: var(--success); }
         .btn-warning { background: var(--warning); color: #000; }
         .btn-danger { background: var(--danger); }
+        .btn-sm { padding: 4px 8px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; background: var(--card-bg); }
+        .btn-sm:hover { background: var(--primary); }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
         
         /* Table */
         .table-wrap {
@@ -535,6 +539,7 @@
             <div class="header-actions">
                 <button class="btn-ghost" onclick="openSettings()">⚙️ Settings</button>
                 <button class="btn-warning" id="fetchBtn" onclick="openFetchModal()">⚡ Fetch URLs</button>
+                <button class="btn-ghost" onclick="fixMalformedUrls()">🔧 Fix URLs</button>
                 <a href="/api/export"><button class="btn-ghost">📥 Export CSV</button></a>
             </div>
         </header>
@@ -726,6 +731,54 @@
             } catch (e) {}
         }
         
+        async function fixMalformedUrls() {
+            if (!confirm("This will automatically fix URLs with malformed markdown patterns. Continue?")) return;
+            try {
+                const r = await fetch("/api/urls/fix-malformed", { method: "POST" });
+                const d = await r.json();
+                showAlert(`Fixed ${d.fixed} URLs, deleted ${d.deleted} invalid entries`, "success");
+                loadData();
+            } catch (e) {
+                showAlert("Error: " + e.message, "error");
+            }
+        }
+
+        async function editUrl(id, currentUrl) {
+            const newUrl = prompt("Edit URL:", currentUrl);
+            if (newUrl === null || newUrl === currentUrl) return;
+            try {
+                const r = await fetch(`/api/urls/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: newUrl })
+                });
+                if (r.ok) {
+                    showAlert("URL updated!", "success");
+                    loadData();
+                } else {
+                    const d = await r.json();
+                    showAlert(d.error || "Error updating", "error");
+                }
+            } catch (e) {
+                showAlert("Error: " + e.message, "error");
+            }
+        }
+
+        async function deleteUrl(id) {
+            if (!confirm("Delete this URL?")) return;
+            try {
+                const r = await fetch(`/api/urls/${id}`, { method: "DELETE" });
+                if (r.ok) {
+                    showAlert("URL deleted!", "success");
+                    loadData();
+                } else {
+                    showAlert("Error deleting", "error");
+                }
+            } catch (e) {
+                showAlert("Error: " + e.message, "error");
+            }
+        }
+
         async function loadURLs(p = 1) {
             page = p;
             const search = document.getElementById('searchInput').value;
@@ -813,6 +866,10 @@
                     <td>${formatDateTime(u.post_date)}</td>
                     <td><span class="badge">r/${u.subreddit}</span></td>
                     <td><code>${u.post_id}</code></td>
+                    <td>
+                        <button class="btn-sm" onclick="editUrl(${u.id}, '${u.url.replace(/'/g, "\\'")}')">✏️</button>
+                        <button class="btn-sm btn-danger" onclick="deleteUrl(${u.id})">🗑️</button>
+                    </td>
                 </tr>`;
             });
             
