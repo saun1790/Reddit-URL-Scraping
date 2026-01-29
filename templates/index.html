@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit URL Scraper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #09090b;
+            --bg-card: #18181b;
+            --bg-hover: #27272a;
+            --border: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .app { max-width: 1600px; margin: 0 auto; padding: 24px; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo h1 { font-size: 24px; font-weight: 700; }
+        .logo span { font-size: 28px; }
+        
+        .header-actions { display: flex; gap: 12px; }
+        
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        .stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .stat-value.small { font-size: 16px; }
+        
+        /* Main Panel */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        input, select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        input::placeholder { color: var(--text-muted); }
+        
+        .search { width: 280px; }
+        
+        /* Buttons */
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        
+        button:hover { background: var(--primary-hover); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-ghost:hover { background: var(--bg-hover); }
+        
+        .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-danger { background: var(--danger); }
+        
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th {
+            background: var(--bg);
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        th:hover {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+        
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.3;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+        
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        th .resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            cursor: col-resize;
+            user-select: none;
+            z-index: 1;
+        }
+        
+        th .resizer:hover {
+            background: var(--primary);
+        }
+        
+        th[data-col="url"] { width: 45%; }
+        th[data-col="date"] { width: 20%; }
+        th[data-col="subreddit"] { width: 20%; }
+        th[data-col="postid"] { width: 15%; }
+        
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        tr:hover { background: var(--bg-hover); }
+        
+        .url-cell {
+            max-width: 500px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { color: var(--primary-hover); text-decoration: underline; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        code {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* Pagination */
+        .panel-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .pagination button:hover:not(:disabled) { background: var(--bg-hover); }
+        .pagination .current { 
+            padding: 8px 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .page-info {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        /* Empty State */
+        .empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty h3 { color: var(--text); font-size: 18px; margin-bottom: 8px; }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Progress Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 { font-size: 18px; }
+        
+        .modal-body { padding: 20px; }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+        }
+        
+        .close-btn:hover { color: var(--text); }
+        
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+        }
+        
+        /* Progress */
+        .progress-section {
+            margin-top: 20px;
+        }
+        
+        .progress-bar-bg {
+            background: var(--bg);
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 999px;
+            transition: width 0.3s;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        
+        .progress-log {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
+        .progress-log div {
+            padding: 4px 0;
+            color: var(--text-muted);
+        }
+        
+        .progress-log div:last-child {
+            color: var(--text);
+        }
+        
+        /* Subreddit Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .tag-remove {
+            background: none;
+            border: none;
+            color: var(--danger);
+            padding: 0;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+        
+        .tag-remove:hover { color: #ff6b6b; }
+        
+        /* Status Alert */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 20px;
+            margin-top: 0;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .alert.show { display: block; }
+        
+        .alert.info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--primary);
+        }
+        
+        .alert.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--success);
+        }
+        
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .toolbar { width: 100%; }
+            .search { width: 100%; }
+            .panel-footer { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="logo">
+                <span>🔗</span>
+                <h1>Reddit URL Scraper</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-ghost" onclick="openSettings()">⚙️ Settings</button>
+                <button class="btn-warning" id="fetchBtn" onclick="openFetchModal()">⚡ Fetch URLs</button>
+                <a href="/api/export"><button class="btn-ghost">📥 Export CSV</button></a>
+            </div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Total URLs</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Subreddits</div>
+                <div class="stat-value" id="statSubs">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Earliest</div>
+                <div class="stat-value small" id="statEarliest">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Latest</div>
+                <div class="stat-value small" id="statLatest">-</div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">Extracted URLs</span>
+                <div class="toolbar">
+                    <input type="text" class="search" id="searchInput" placeholder="🔍 Search URLs...">
+                    <select id="filterSub">
+                        <option value="">All Subreddits</option>
+                    </select>
+                    <select id="perPage">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <button class="btn-ghost" onclick="loadData()">🔄 Refresh</button>
+                </div>
+            </div>
+            
+            <div id="alertBox" class="alert"></div>
+            
+            <div class="table-wrap">
+                <div id="content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-footer">
+                <div class="page-info" id="pageInfo">Showing 0 of 0</div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fetch Modal -->
+    <div id="fetchModal" class="modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>⚡ Fetch URLs</h2>
+                <button class="close-btn" onclick="closeModal('fetchModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="fetchForm">
+                    <div class="form-group">
+                        <label>Mode</label>
+                        <select id="fetchMode">
+                            <option value="daily">Daily (new posts)</option>
+                            <option value="backfill">Backfill (historical)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="daysGroup" style="display:none">
+                        <label>Days to Backfill</label>
+                        <input type="number" id="fetchDays" value="90" min="1" max="365">
+                        <p style="color: var(--text-muted); font-size: 12px; margin-top: 6px;">
+                            💡 Tip: Uses multiple Reddit endpoints (new, top, hot) to maximize coverage. Can retrieve up to 3+ months of data.
+                        </p>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 16px;">
+                        Will scrape: <span id="fetchSubsPreview" style="color: var(--primary)"></span>
+                    </p>
+                </div>
+                <div id="fetchProgress" style="display:none">
+                    <div class="progress-section">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span id="progressText">Starting...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-log" id="progressLog"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="fetchFooter">
+                <button class="btn-ghost" onclick="closeModal('fetchModal')">Cancel</button>
+                <button class="btn-warning" id="startFetchBtn" onclick="startFetch()">Start Scraping</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <button class="close-btn" onclick="closeModal('settingsModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Configured Subreddits</label>
+                    <div id="subTags" class="tags"></div>
+                </div>
+                <div class="form-group">
+                    <label>Add Subreddit</label>
+                    <input type="text" id="newSubInput" placeholder="Enter name (without r/)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-ghost" onclick="closeModal('settingsModal')">Close</button>
+                <button onclick="addSub()">Add Subreddit</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // State
+        let page = 1;
+        let total = 0;
+        let subs = JSON.parse(localStorage.getItem('subs') || '["SideProject", "startups"]');
+        let checkInterval = null;
+        let searchTimeout = null;
+        let sortBy = 'post_date';
+        let sortDir = 'desc';
+        let currentData = [];
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setInterval(loadData, 30000);
+            
+            document.getElementById('searchInput').addEventListener('input', e => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => loadURLs(1), 300);
+            });
+            
+            document.getElementById('filterSub').addEventListener('change', () => loadURLs(1));
+            document.getElementById('perPage').addEventListener('change', () => loadURLs(1));
+            document.getElementById('fetchMode').addEventListener('change', e => {
+                document.getElementById('daysGroup').style.display = e.target.value === 'backfill' ? 'block' : 'none';
+            });
+            
+            document.getElementById('newSubInput').addEventListener('keypress', e => {
+                if (e.key === 'Enter') addSub();
+            });
+        });
+        
+        // Data Loading
+        async function loadData() {
+            await Promise.all([loadStats(), loadSubreddits(), loadURLs(page)]);
+        }
+        
+        async function loadStats() {
+            try {
+                const r = await fetch('/api/stats');
+                const d = await r.json();
+                document.getElementById('statTotal').textContent = d.total_urls.toLocaleString();
+                document.getElementById('statSubs').textContent = d.subreddit_count;
+                document.getElementById('statEarliest').textContent = formatDate(d.earliest_post);
+                document.getElementById('statLatest').textContent = formatDate(d.latest_post);
+            } catch (e) {}
+        }
+        
+        async function loadSubreddits() {
+            try {
+                const r = await fetch('/api/subreddits');
+                const d = await r.json();
+                const select = document.getElementById('filterSub');
+                const val = select.value;
+                select.innerHTML = '<option value="">All Subreddits</option>';
+                d.forEach(s => {
+                    select.innerHTML += `<option value="${s.subreddit}">r/${s.subreddit} (${s.count})</option>`;
+                });
+                select.value = val;
+            } catch (e) {}
+        }
+        
+        async function loadURLs(p = 1) {
+            page = p;
+            const search = document.getElementById('searchInput').value;
+            const sub = document.getElementById('filterSub').value;
+            const perPage = document.getElementById('perPage').value;
+            
+            const params = new URLSearchParams({ page: p, per_page: perPage });
+            if (search) params.append('search', search);
+            if (sub) params.append('subreddit', sub);
+            
+            try {
+                const r = await fetch(`/api/urls?${params}`);
+                const d = await r.json();
+                total = d.total;
+                currentData = d.urls;
+                sortData();
+                renderTable(currentData);
+                renderPagination(d.page, d.pages, d.total, d.per_page);
+            } catch (e) {
+                document.getElementById('content').innerHTML = '<div class="empty"><div class="empty-icon">❌</div><h3>Error</h3><p>Failed to load</p></div>';
+            }
+        }
+        
+        function sortData() {
+            currentData.sort((a, b) => {
+                let aVal = a[sortBy];
+                let bVal = b[sortBy];
+                
+                // Convert dates for comparison
+                if (sortBy === 'post_date') {
+                    aVal = new Date(aVal).getTime();
+                    bVal = new Date(bVal).getTime();
+                }
+                
+                if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        
+        function toggleSort(column) {
+            if (sortBy === column) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortBy = column;
+                sortDir = 'asc';
+            }
+            sortData();
+            renderTable(currentData);
+        }
+        
+        function renderTable(urls) {
+            const content = document.getElementById('content');
+            
+            if (!urls.length) {
+                content.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>No URLs Found</h3><p>Click "Fetch URLs" to start scraping</p></div>';
+                return;
+            }
+            
+            const getSortClass = (col) => {
+                if (sortBy !== col) return 'sortable';
+                return sortDir === 'asc' ? 'sort-asc' : 'sort-desc';
+            };
+            
+            let html = `<table>
+                <thead><tr>
+                    <th data-col="url" class="${getSortClass('url')}" onclick="toggleSort('url')">
+                        URL<span class="resizer" onmousedown="initResize(event, 0)"></span>
+                    </th>
+                    <th data-col="date" class="${getSortClass('post_date')}" onclick="toggleSort('post_date')">
+                        Date<span class="resizer" onmousedown="initResize(event, 1)"></span>
+                    </th>
+                    <th data-col="subreddit" class="${getSortClass('subreddit')}" onclick="toggleSort('subreddit')">
+                        Subreddit<span class="resizer" onmousedown="initResize(event, 2)"></span>
+                    </th>
+                    <th data-col="postid" class="${getSortClass('post_id')}" onclick="toggleSort('post_id')">
+                        Post ID<span class="resizer" onmousedown="initResize(event, 3)"></span>
+                    </th>
+                </tr></thead>
+                <tbody>`;
+            
+            urls.forEach(u => {
+                html += `<tr>
+                    <td class="url-cell"><a href="${u.url}" target="_blank">${u.url}</a></td>
+                    <td>${formatDateTime(u.post_date)}</td>
+                    <td><span class="badge">r/${u.subreddit}</span></td>
+                    <td><code>${u.post_id}</code></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            content.innerHTML = html;
+        }
+        
+        function renderPagination(current, pages, total, perPage) {
+            const start = (current - 1) * perPage + 1;
+            const end = Math.min(current * perPage, total);
+            
+            document.getElementById('pageInfo').textContent = 
+                total > 0 ? `Showing ${start}-${end} of ${total.toLocaleString()}` : 'No results';
+            
+            if (pages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            
+            document.getElementById('pagination').innerHTML = `
+                <button onclick="loadURLs(1)" ${current === 1 ? 'disabled' : ''}>«</button>
+                <button onclick="loadURLs(${current - 1})" ${current === 1 ? 'disabled' : ''}>‹</button>
+                <span class="current">Page ${current} of ${pages}</span>
+                <button onclick="loadURLs(${current + 1})" ${current === pages ? 'disabled' : ''}>›</button>
+                <button onclick="loadURLs(${pages})" ${current === pages ? 'disabled' : ''}>»</button>
+            `;
+        }
+        
+        // Fetch
+        function openFetchModal() {
+            document.getElementById('fetchForm').style.display = 'block';
+            document.getElementById('fetchProgress').style.display = 'none';
+            document.getElementById('startFetchBtn').disabled = false;
+            document.getElementById('fetchSubsPreview').textContent = subs.map(s => 'r/' + s).join(', ');
+            document.getElementById('fetchModal').classList.add('active');
+        }
+        
+        async function startFetch() {
+            if (!subs.length) {
+                showAlert('Configure subreddits in Settings first', 'error');
+                return;
+            }
+            
+            const mode = document.getElementById('fetchMode').value;
+            const days = parseInt(document.getElementById('fetchDays').value);
+            
+            document.getElementById('fetchForm').style.display = 'none';
+            document.getElementById('fetchProgress').style.display = 'block';
+            document.getElementById('startFetchBtn').disabled = true;
+            document.getElementById('progressLog').innerHTML = '';
+            
+            try {
+                const r = await fetch('/api/scrape/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, subreddits: subs, days })
+                });
+                
+                if (r.ok) {
+                    checkProgress();
+                } else {
+                    const d = await r.json();
+                    showAlert('Error: ' + d.error, 'error');
+                    closeModal('fetchModal');
+                }
+            } catch (e) {
+                showAlert('Error: ' + e.message, 'error');
+                closeModal('fetchModal');
+            }
+        }
+        
+        function checkProgress() {
+            if (checkInterval) clearInterval(checkInterval);
+            
+            checkInterval = setInterval(async () => {
+                try {
+                    const r = await fetch('/api/scrape/status');
+                    const s = await r.json();
+                    
+                    document.getElementById('progressBar').style.width = s.progress + '%';
+                    document.getElementById('progressPercent').textContent = s.progress + '%';
+                    document.getElementById('progressText').textContent = 
+                        s.running ? `Scraping r/${s.current_sub} (${s.completed_subs}/${s.total_subs})` : 'Done';
+                    
+                    const log = document.getElementById('progressLog');
+                    log.innerHTML = s.log.map(l => `<div>${l}</div>`).join('');
+                    log.scrollTop = log.scrollHeight;
+                    
+                    if (!s.running) {
+                        clearInterval(checkInterval);
+                        document.getElementById('startFetchBtn').disabled = false;
+                        
+                        setTimeout(() => {
+                            closeModal('fetchModal');
+                            loadData();
+                            
+                            if (s.error) {
+                                showAlert('Error: ' + s.error, 'error');
+                            } else {
+                                showAlert(`Found ${s.urls_found} new URLs!`, 'success');
+                            }
+                        }, 1500);
+                    }
+                } catch (e) {}
+            }, 1000);
+        }
+        
+        // Settings
+        function openSettings() {
+            renderSubTags();
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        
+        function renderSubTags() {
+            document.getElementById('subTags').innerHTML = subs.map(s => 
+                `<span class="tag">r/${s} <button class="tag-remove" onclick="removeSub('${s}')">×</button></span>`
+            ).join('');
+        }
+        
+        function addSub() {
+            const input = document.getElementById('newSubInput');
+            const sub = input.value.trim().replace(/^r\//, '');
+            if (sub && !subs.includes(sub)) {
+                subs.push(sub);
+                localStorage.setItem('subs', JSON.stringify(subs));
+                renderSubTags();
+                input.value = '';
+            }
+        }
+        
+        function removeSub(sub) {
+            subs = subs.filter(s => s !== sub);
+            localStorage.setItem('subs', JSON.stringify(subs));
+            renderSubTags();
+        }
+        
+        // Modals
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        // Alert
+        function showAlert(msg, type) {
+            const box = document.getElementById('alertBox');
+            box.textContent = msg;
+            box.className = `alert show ${type}`;
+            setTimeout(() => box.className = 'alert', 5000);
+        }
+        
+        // Formatting
+        function formatDate(d) {
+            if (!d || d === 'N/A') return '-';
+            return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        
+        function formatDateTime(d) {
+            return new Date(d).toLocaleString('en-US', { 
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+        
+        // Column Resizing
+        let activeResizer = null;
+        let startX = 0;
+        let startWidth = 0;
+        
+        function initResize(e, colIndex) {
+            e.stopPropagation(); // Don't trigger sort
+            activeResizer = colIndex;
+            const th = e.target.parentElement;
+            startX = e.clientX;
+            startWidth = th.offsetWidth;
+            
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
+        }
+        
+        function doResize(e) {
+            if (activeResizer === null) return;
+            const table = document.querySelector('table');
+            const th = table.querySelectorAll('th')[activeResizer];
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(50, startWidth + diff);
+            th.style.width = newWidth + 'px';
+        }
+        
+        function stopResize() {
+            activeResizer = null;
+            document.removeEventListener('mousemove', doResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+    </script>
+</body>
+</html>

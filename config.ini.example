@@ -1,0 +1,16 @@
+# Reddit API Configuration
+# Copy this file to config.ini and fill in your credentials
+
+[reddit]
+# Get these from: https://www.reddit.com/prefs/apps
+# See API_SETUP.md for detailed instructions
+
+# Your Reddit app client ID (under "personal use script")
+client_id = YOUR_CLIENT_ID
+
+# Your Reddit app client secret
+client_secret = YOUR_CLIENT_SECRET
+
+# User agent format: platform:app_name:version (by /u/your_username)
+# Example: linux:reddit_url_scraper:v1.0 (by /u/myusername)
+user_agent = YOUR_USER_AGENT
