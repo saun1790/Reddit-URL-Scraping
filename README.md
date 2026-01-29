@@ -355,3 +355,102 @@ Run:
 chmod +x install-service.sh
 sudo ./install-service.sh
 ```
+
+## Production Deployment (VPS with nginx + SSL)
+
+One-command installation for Ubuntu/Debian VPS with nginx and Let's Encrypt SSL.
+
+### Prerequisites
+
+- Ubuntu 20.04+ or Debian 11+ VPS
+- Domain pointing to your VPS IP
+- Root access (sudo)
+
+### Quick Install
+
+```bash
+# Clone repository
+git clone https://github.com/saun1790/Reddit-URL-Scraping.git
+cd Reddit-URL-Scraping
+
+# Run production installer
+sudo ./install-production.sh yourdomain.com your-email@example.com
+```
+
+### What the installer does:
+
+1. ✅ Installs Python, nginx, certbot, ufw
+2. ✅ Creates Python virtual environment
+3. ✅ Generates secure admin credentials (saved to `.env`)
+4. ✅ Configures systemd service (auto-start on boot)
+5. ✅ Configures daily scraper timer (9 AM)
+6. ✅ Sets up nginx as reverse proxy
+7. ✅ Obtains SSL certificate from Let's Encrypt
+8. ✅ Configures firewall (ports 22, 80, 443)
+
+### After Installation
+
+Your app will be live at `https://yourdomain.com`
+
+**View credentials:**
+```bash
+cat .env
+```
+
+**Service commands:**
+```bash
+sudo systemctl status reddit-scraper      # Check status
+sudo systemctl restart reddit-scraper     # Restart
+sudo systemctl stop reddit-scraper        # Stop
+sudo journalctl -u reddit-scraper -f      # Live logs
+```
+
+**SSL certificate renewal (automatic, but to test):**
+```bash
+sudo certbot renew --dry-run
+```
+
+### Manual nginx Configuration
+
+If you prefer manual setup:
+
+```nginx
+# /etc/nginx/sites-available/reddit-scraper
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3010;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Then run:
+```bash
+sudo ln -s /etc/nginx/sites-available/reddit-scraper /etc/nginx/sites-enabled/
+sudo certbot --nginx -d yourdomain.com
+sudo systemctl restart nginx
+```
+
+### Environment Variables
+
+The app supports these environment variables (via `.env` file):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ADMIN_USERNAME` | admin | Login username |
+| `ADMIN_PASSWORD` | (generated) | Login password |
+| `SECRET_KEY` | (generated) | Flask session key |
+| `DEBUG` | true | Debug mode (false in production) |
+
+### Security Notes
+
+- `.env` file has `chmod 600` (only owner can read)
+- nginx proxies to localhost only (3010 not exposed)
+- Firewall blocks all ports except 22, 80, 443
+- SSL auto-renews via certbot timer

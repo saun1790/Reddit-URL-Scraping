@@ -15,13 +15,13 @@ os.chdir(SCRIPT_DIR)
 PYTHON_EXE = sys.executable
 
 app = Flask(__name__)
-app.secret_key = 'reddit-scraper-secret-key-2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'reddit-scraper-secret-key-2026')
 
 # ============================================
-# AUTHENTICATION
+# AUTHENTICATION (uses .env in production)
 # ============================================
 USERS = {
-    'admin': 'gwF1cZePMdTFd4Ls'
+    os.environ.get('ADMIN_USERNAME', 'admin'): os.environ.get('ADMIN_PASSWORD', 'gwF1cZePMdTFd4Ls')
 }
 
 def login_required(f):
@@ -285,9 +285,21 @@ def fix_malformed_urls():
         conn.close()
 
 if __name__ == '__main__':
+    # Load .env file if exists (for local development)
+    env_file = os.path.join(SCRIPT_DIR, '.env')
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+    
+    debug_mode = os.environ.get('DEBUG', 'true').lower() == 'true'
+    
     print("\n" + "=" * 50)
     print("🔗 Reddit URL Scraper")
     print("=" * 50)
-    print("\n🔐 Login: admin / gwF1cZePMdTFd4Ls")
+    print(f"\n🔐 Login: {os.environ.get('ADMIN_USERNAME', 'admin')} / {os.environ.get('ADMIN_PASSWORD', 'gwF1cZePMdTFd4Ls')}")
     print("🚀 http://localhost:3010\n")
-    app.run(host='0.0.0.0', port=3010, debug=True)
+    app.run(host='0.0.0.0', port=3010, debug=debug_mode)

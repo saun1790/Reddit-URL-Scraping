@@ -1,14 +1,4 @@
+.env
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
 venv/
-ENV/
-*.sqlite
-*.sqlite3
-.DS_Store
-.vscode/
-.idea/
-*.log
-config.ini
