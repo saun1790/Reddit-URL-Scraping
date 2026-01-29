@@ -96,28 +96,43 @@ python -m venv venv
 
 ### Linux / macOS
 
-**Start (foreground):**
+**Start server:**
 ```bash
 cd ~/projects/Reddit-URL-Scraping
 ./venv/bin/python web_viewer.py
 ```
 
-**Start (background):**
+**Output when server starts:**
+```
+==================================================
+🔗 Reddit URL Scraper
+==================================================
+
+🚀 http://localhost:3010
+
+ * Running on http://127.0.0.1:3010
+ * Running on http://YOUR_IP:3010
+```
+
+**Access the dashboard:**
+- Local: http://localhost:3010
+- Network: http://YOUR_IP:3010 (from other devices on same network)
+
+**Start in background:**
 ```bash
 cd ~/projects/Reddit-URL-Scraping
 nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
 echo $! > web_viewer.pid
+echo "Server started! Open http://localhost:3010"
 ```
 
-**Stop:**
+**Stop server:**
 ```bash
-cd ~/projects/Reddit-URL-Scraping
 kill $(cat web_viewer.pid)
 ```
 
-**Restart:**
+**Restart server:**
 ```bash
-cd ~/projects/Reddit-URL-Scraping
 kill $(cat web_viewer.pid) 2>/dev/null
 nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
 echo $! > web_viewer.pid
@@ -130,27 +145,26 @@ tail -f web_viewer.log
 
 ### Windows
 
-**Start (foreground):**
+**Start server:**
 ```powershell
 cd C:\projects\Reddit-URL-Scraping
 .\venv\Scripts\python web_viewer.py
 ```
 
-**Start (background):**
+**Start in background:**
 ```powershell
 cd C:\projects\Reddit-URL-Scraping
-Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py" -RedirectStandardOutput "web_viewer.log" -RedirectStandardError "web_viewer_error.log"
+Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py"
+Write-Host "Server started! Open http://localhost:3010"
 ```
 
-**Stop:**
+**Stop server:**
 ```powershell
 Get-Process python | Stop-Process
 ```
 
-**Open in browser:**
-```
-http://localhost:3010
-```
+**Access the dashboard:**
+- Open browser: http://localhost:3010
 
 ## Command Line
 
@@ -164,7 +178,6 @@ cd ~/projects/Reddit-URL-Scraping
 
 **Daily update:**
 ```bash
-cd ~/projects/Reddit-URL-Scraping
 ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
 ```
 
@@ -227,7 +240,7 @@ Reddit-URL-Scraping/
 ├── web_viewer.py             # Web dashboard
 ├── reddit_scraper_noauth.py  # Main scraper
 ├── database.py               # SQLite handler
-├── reddit_urls.db            # Database
+├── reddit_urls.db            # Database (created on first run)
 ├── requirements.txt          # Dependencies
 └── templates/
     └── index.html            # Dashboard UI
