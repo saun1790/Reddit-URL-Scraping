@@ -706,9 +706,9 @@
                 const r = await fetch('/api/stats');
                 const d = await r.json();
                 document.getElementById('statTotal').textContent = d.total_urls.toLocaleString();
-                document.getElementById('statSubs').textContent = d.subreddit_count;
-                document.getElementById('statEarliest').textContent = formatDate(d.earliest_post);
-                document.getElementById('statLatest').textContent = formatDate(d.latest_post);
+                document.getElementById('statSubs').textContent = d.subreddits;
+                document.getElementById('statEarliest').textContent = formatDate(d.oldest_post);
+                document.getElementById('statLatest').textContent = formatDate(d.newest_post);
             } catch (e) {}
         }
         
@@ -720,7 +720,7 @@
                 const val = select.value;
                 select.innerHTML = '<option value="">All Subreddits</option>';
                 d.forEach(s => {
-                    select.innerHTML += `<option value="${s.subreddit}">r/${s.subreddit} (${s.count})</option>`;
+                    select.innerHTML += `<option value="${s.name}">r/${s.name} (${s.count})</option>`;
                 });
                 select.value = val;
             } catch (e) {}
@@ -892,10 +892,10 @@
                     const r = await fetch('/api/scrape/status');
                     const s = await r.json();
                     
-                    document.getElementById('progressBar').style.width = s.progress + '%';
-                    document.getElementById('progressPercent').textContent = s.progress + '%';
+                    document.getElementById('progressBar').style.width = (s.running ? 50 : 100) + '%';
+                    document.getElementById('progressPercent').textContent = (s.running ? 50 : 100) + '%';
                     document.getElementById('progressText').textContent = 
-                        s.running ? `Scraping r/${s.current_sub} (${s.completed_subs}/${s.total_subs})` : 'Done';
+                        s.running ? `Scraping r/${(s.log && s.log.length > 0 ? "processing" : "starting")} (${s.urls_found}/${(s.log ? s.log.length : 0)})` : 'Done';
                     
                     const log = document.getElementById('progressLog');
                     log.innerHTML = s.log.map(l => `<div>${l}</div>`).join('');
