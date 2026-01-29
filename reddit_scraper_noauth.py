@@ -47,8 +47,21 @@ class RedditURLScraperNoAuth:
         normalized = set()
         
         for url in urls:
-            url = url.rstrip('.,;:!?)]\'"')
-            if not self._is_reddit_url(url):
+            # Clean trailing punctuation
+            url = url.rstrip('.,;:!?)]\'"<>')
+            
+            # Fix malformed markdown URLs like "https://site.com](https://site.com"
+            if '](' in url and 'http' in url:
+                parts = url.split('](')
+                url = parts[-1]
+            
+            # Remove any remaining markdown artifacts
+            url = url.split(')')[0]
+            url = url.split('<')[0]
+            url = url.split('!')[0]
+            url = url.rstrip('.,;:!?)]\'"<>')
+            
+            if url.startswith('http') and not self._is_reddit_url(url):
                 normalized.add(url)
         
         return normalized
