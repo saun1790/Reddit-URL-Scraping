@@ -137,6 +137,8 @@ class RedditURLScraperNoAuth:
                 if response.status_code != 200:
                     break
                 
+                # Force UTF-8 encoding for Windows compatibility
+                response.encoding = 'utf-8'
                 data = response.json()
                 page_posts = data.get('data', {}).get('children', [])
                 
