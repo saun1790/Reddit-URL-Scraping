@@ -1,499 +1,274 @@
-# Reddit URL Scraper
+# Reddit URL Scraper - Manual de Usuario
 
-Extract external URLs from Reddit subreddit posts. Includes web dashboard and historical backfill up to 6 months.
+Sistema para extraer y organizar URLs compartidas en subreddits de Reddit.
 
-![Dashboard Preview](https://img.shields.io/badge/Dashboard-Live-green) ![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue)
+## 🎯 ¿Qué hace?
 
-## Features
+Recopila automáticamente **todas las URLs** (enlaces web) de posts en los subreddits que configures:
+- Proyectos, startups, herramientas
+- Apps, sitios web, demos
+- Todo se guarda en una base de datos
+- Dashboard web para ver y buscar fácilmente
 
-- 🔄 **Backfill mode**: Extract posts from last N days (up to 180 days)
-- 📅 **Daily mode**: Fetch only new posts since last run
-- 🚫 **No duplicates**: SQLite database with unique constraints
-- 📊 **Multiple subreddits**: Track unlimited subreddits
-- 📥 **CSV export**: One click download
-- 🖥️ **Web dashboard**: Interactive UI with search, filters, and pagination
-- 🔓 **No API keys required**: Uses Reddit's public JSON endpoints
+## ✨ Características
 
-## Technologies
+- 📊 **Dashboard Visual** - Interfaz web fácil de usar
+- 🔍 **Búsqueda** - Encuentra URLs por palabra clave
+- 📥 **Exportar a Excel** - Descarga datos en CSV
+- 🔄 **Actualización Diaria** - Solo obtiene posts nuevos
+- 📚 **Historial Completo** - Puede obtener posts de hasta 6 meses
+- 🚫 **Sin duplicados** - No guarda la misma URL dos veces
+- 🔓 **Sin cuenta Reddit** - No requiere login
 
-| Component | Technology |
-|-----------|------------|
-| Backend | Python 3.8+ |
-| Web Framework | Flask |
-| Database | SQLite |
-| Reddit Data | Public JSON API (no auth) |
-| Frontend | HTML5 / CSS3 / Vanilla JS |
+## 📋 Requisitos Previos (Windows)
 
-## Prerequisites
+1. **Python 3.8 o superior**
+   - Descargar de: https://www.python.org/downloads/
+   - ⚠️ **IMPORTANTE:** Marcar "Add Python to PATH" durante instalación
 
-### Linux (Ubuntu/Debian)
-```bash
-sudo apt update
-sudo apt install python3 python3-venv python3-pip git -y
-```
+2. **Git** (opcional, para actualizaciones)
+   - Descargar de: https://git-scm.com/download/win
 
-### Linux (CentOS/RHEL/Fedora)
-```bash
-sudo dnf install python3 python3-pip git -y
-```
+---
 
-### macOS
-```bash
-brew install python git
-```
+## 🚀 Instalación en Windows
 
-### Windows
-1. Download Python from https://www.python.org/downloads/
-2. **IMPORTANT:** Check "Add Python to PATH" during installation
-3. Download Git from https://git-scm.com/download/win
+### Paso 1: Descargar el Proyecto
 
-## Installation
-
-### Linux / macOS
-```bash
+**Opción A - Con Git:**
+```powershell
 git clone https://github.com/saun1790/Reddit-URL-Scraping.git
 cd Reddit-URL-Scraping
-python3 -m venv venv
-./venv/bin/pip install -r requirements.txt
 ```
 
-### Windows (PowerShell)
+**Opción B - Sin Git:**
+1. Ve a: https://github.com/saun1790/Reddit-URL-Scraping
+2. Clic en botón verde "Code" → "Download ZIP"
+3. Descomprime el archivo
+4. Abre PowerShell en esa carpeta (Shift + Click derecho → "Abrir PowerShell aquí")
+
+### Paso 2: Instalar Dependencias
+
 ```powershell
-# If you get execution policy error, run this first:
+# Si te da error de permisos, ejecuta esto primero:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-git clone https://github.com/saun1790/Reddit-URL-Scraping.git
-cd Reddit-URL-Scraping
+# Crear entorno virtual
 python -m venv venv
+
+# Instalar librerías
 .\venv\Scripts\pip install -r requirements.txt
 ```
 
-## Quick Start
+✅ **¡Instalación completa!**
 
-### Start the Web Dashboard
+---
 
-**Linux / macOS:**
-```bash
-./venv/bin/python web_viewer.py
-```
+## 🖥️ Usar el Dashboard
 
-**Windows:**
+### Iniciar el Sistema
+
 ```powershell
 .\venv\Scripts\python web_viewer.py
 ```
 
-Open your browser: **http://localhost:3010**
-
-### Dashboard Features
-
-1. **⚙️ Settings** - Configure which subreddits to track (comma-separated, without r/)
-2. **⚡ Fetch URLs** - Run scraper in Daily or Backfill mode
-3. **🔍 Search** - Filter URLs by keyword
-4. **📥 Export CSV** - Download all data
-
-## Command Line Usage
-
-### Backfill (Historical Data)
-
-**Linux / macOS:**
-```bash
-# Last 30 days
-./venv/bin/python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
-
-# Last 6 months, multiple subreddits
-./venv/bin/python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups entrepreneur
+Verás algo como:
+```
+ * Running on http://127.0.0.1:3010
 ```
 
-**Windows:**
+Abre tu navegador en: **http://localhost:3010**
+
+### Configurar Subreddits
+
+1. Clic en **⚙️ Settings** (esquina superior derecha)
+2. Escribe el nombre del subreddit **sin** "r/" (ejemplo: `SideProject`)
+3. Presiona Enter o clic en "+"
+4. Para eliminar: clic en ❌ al lado del nombre
+
+**Subreddits recomendados:**
+- `SideProject` - Proyectos personales
+- `startups` - Startups y emprendimiento  
+- `entrepreneur` - Negocios
+- `InternetIsBeautiful` - Sitios web interesantes
+
+### Obtener URLs
+
+1. Clic en **⚡ Fetch URLs**
+2. Selecciona modo:
+   - **Daily** (rápido, 1-2 min) - Solo posts nuevos
+   - **Backfill** (lento, 5-10 min) - Posts históricos
+3. Clic en **Start**
+4. Espera a que termine
+
+### Buscar y Filtrar
+
+- **Búsqueda:** Escribe palabra clave (ej: "AI", "SaaS")
+- **Filtro:** Desplegable para ver solo un subreddit
+- **Exportar:** Botón "📥 Export CSV" descarga todo en Excel
+
+---
+
+## 💻 Uso Desde Línea de Comandos
+
+### Actualización Diaria (Recomendado)
+
 ```powershell
-# Last 30 days
+.\venv\Scripts\python reddit_scraper_noauth.py --daily --subreddits SideProject startups
+```
+
+### Obtener Histórico (Primera Vez)
+
+```powershell
+# Últimos 30 días
 .\venv\Scripts\python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
 
-# Last 6 months, multiple subreddits
-.\venv\Scripts\python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups entrepreneur
+# Últimos 6 meses
+.\venv\Scripts\python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups
 ```
 
-### Daily Update
+### Exportar a CSV
 
-**Linux / macOS:**
-```bash
-./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
-```
-
-**Windows:**
-```powershell
-.\venv\Scripts\python reddit_scraper_noauth.py --daily --subreddits SideProject
-```
-
-### Export to CSV
-
-**Linux / macOS:**
-```bash
-./venv/bin/python reddit_scraper_noauth.py --export urls.csv
-```
-
-**Windows:**
 ```powershell
 .\venv\Scripts\python reddit_scraper_noauth.py --export urls.csv
 ```
 
-### View Statistics
+### Ver Estadísticas
 
-**Linux / macOS:**
-```bash
-./venv/bin/python reddit_scraper_noauth.py --stats
-```
-
-**Windows:**
 ```powershell
 .\venv\Scripts\python reddit_scraper_noauth.py --stats
 ```
 
-## Running in Background
+---
 
-### Linux / macOS
-```bash
-# Start
-nohup ./venv/bin/python web_viewer.py > web_viewer.log 2>&1 &
-echo $! > web_viewer.pid
+## 🔄 Actualizar el Sistema
 
-# Stop
-kill $(cat web_viewer.pid)
+Si hay una versión nueva disponible:
 
-# View logs
-tail -f web_viewer.log
-```
-
-### Windows (PowerShell)
 ```powershell
-# Option 1: Using pythonw (no console window)
-.\venv\Scripts\pythonw.exe web_viewer.py
+# Con Git
+git pull
 
-# Option 2: Using Start-Process (hidden window)
-Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py"
-
-# Stop the process
-Stop-Process -Name python
-# or
-Stop-Process -Name pythonw
-
-# Check if running
-Get-Process python* | Select-Object Name, Id, CPU
+# Reinstalar dependencias (si hubo cambios)
+.\venv\Scripts\pip install -r requirements.txt --upgrade
 ```
 
-## Automation (Cron)
+---
 
-Run daily at 9 AM:
-```bash
-crontab -e
-```
+## 📊 Estructura de Datos
 
-Add:
-```bash
-0 9 * * * cd /path/to/Reddit-URL-Scraping && ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject >> cron.log 2>&1
-```
+Los datos se guardan en `reddit_urls.db` (base de datos SQLite)
 
-## Data Structure
-
-| Field | Description |
+| Campo | Descripción |
 |-------|-------------|
-| `url` | External URL found in post |
-| `post_date` | Post timestamp (UTC) |
-| `subreddit` | Source subreddit |
-| `post_id` | Reddit post ID |
+| `url` | Enlace web encontrado en el post |
+| `post_date` | Fecha del post (UTC) |
+| `subreddit` | De qué subreddit viene |
+| `post_id` | ID del post en Reddit |
 
-Database file: `reddit_urls.db` (SQLite, created on first run)
+---
 
-## Project Structure
+## 🆘 Solución de Problemas
+
+### "Puerto 3010 ya está en uso"
+
+Significa que ya tienes el dashboard abierto. Cierra la ventana anterior o:
+
+```powershell
+# Ver qué está usando el puerto
+netstat -ano | findstr :3010
+
+# Matar el proceso (reemplaza PID con el número que aparece)
+taskkill /PID <numero> /F
+```
+
+### "ModuleNotFoundError: No module named 'flask'"
+
+Reinstala las dependencias:
+
+```powershell
+.\venv\Scripts\pip install -r requirements.txt
+```
+
+### "Error de permisos al activar venv"
+
+Ejecuta primero:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### Scraping muy lento
+
+- Usa **Daily** en lugar de **Backfill**
+- Reduce el número de días en Backfill
+- Verifica tu conexión a internet
+
+### No encuentra URLs nuevas
+
+Posibles causas:
+- No hay posts nuevos en ese subreddit
+- Ya tienes todos los posts recientes
+- El subreddit está inactivo
+
+**Solución:** Prueba otro subreddit más activo
+
+---
+
+## 📁 Archivos del Proyecto
 
 ```
 Reddit-URL-Scraping/
-├── web_viewer.py             # Web dashboard server
-├── reddit_scraper_noauth.py  # Main scraper (CLI)
-├── database.py               # SQLite database handler
-├── requirements.txt          # Python dependencies
+├── web_viewer.py             # Dashboard web
+├── reddit_scraper_noauth.py  # Scraper (línea de comandos)
+├── database.py               # Manejo de base de datos
+├── requirements.txt          # Librerías necesarias
+├── USER_GUIDE.md            # Guía completa de usuario (NO TÉCNICA)
 ├── templates/
-│   └── index.html            # Dashboard UI
-└── reddit_urls.db            # Database (auto-created)
+│   └── index.html           # Interfaz del dashboard
+└── reddit_urls.db           # Base de datos (se crea automáticamente)
 ```
 
-## Troubleshooting
+---
 
-**Port 3010 already in use:**
-```bash
-# Find and kill process
-lsof -i :3010
-kill -9 <PID>
-```
+## ❓ Preguntas Frecuentes
 
-**Permission denied:**
-```bash
-chmod +x ./venv/bin/python
-```
+**¿Necesito una cuenta de Reddit?**  
+No, el sistema funciona sin autenticación.
 
-**Module not found:**
-```bash
-./venv/bin/pip install -r requirements.txt
-```
+**¿Cuántos subreddits puedo agregar?**  
+Todos los que quieras, pero recomendamos 3-5 para empezar.
 
-## License
+**¿Los datos se guardan permanentemente?**  
+Sí, todo se guarda en `reddit_urls.db`. No se pierde al cerrar.
 
-MIT
+**¿Puedo usar esto en otra computadora?**  
+Sí, copia la carpeta completa (incluye el archivo `.db`).
 
-## Linux Service (systemd)
+**¿Cada cuánto debo ejecutar el scraper?**  
+Depende de tus necesidades:
+- Diario si quieres estar al día
+- Semanal si solo revisas periódicamente
+- Cuando lo necesites
 
-Create a systemd service to run the web dashboard automatically on boot.
+---
 
-### 1. Create Service File
+## 📚 Documentación Adicional
 
-```bash
-sudo nano /etc/systemd/system/reddit-scraper.service
-```
+- **USER_GUIDE.md** - Guía completa para usuarios (recomendado)
+- **SUPER_SCRAPING_AGENT_PROMPT.md** - Documentación técnica avanzada
 
-Paste the following (adjust paths and user):
+---
 
-```ini
-[Unit]
-Description=Reddit URL Scraper Web Dashboard
-After=network.target
+## 📞 Soporte
 
-[Service]
-Type=simple
-User=YOUR_USERNAME
-WorkingDirectory=/home/YOUR_USERNAME/Reddit-URL-Scraping
-ExecStart=/home/YOUR_USERNAME/Reddit-URL-Scraping/venv/bin/python web_viewer.py
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
+Si tienes problemas:
+1. Revisa esta guía primero
+2. Consulta **USER_GUIDE.md** para más detalles
+3. Verifica que tienes la última versión (`git pull`)
 
-[Install]
-WantedBy=multi-user.target
-```
+---
 
-> **Note:** Replace `YOUR_USERNAME` with your actual username and adjust paths if needed.
-
-### 2. Enable and Start
-
-```bash
-# Reload systemd
-sudo systemctl daemon-reload
-
-# Enable on boot
-sudo systemctl enable reddit-scraper
-
-# Start service
-sudo systemctl start reddit-scraper
-```
-
-### 3. Service Commands
-
-| Command | Description |
-|---------|-------------|
-| `sudo systemctl start reddit-scraper` | Start the service |
-| `sudo systemctl stop reddit-scraper` | Stop the service |
-| `sudo systemctl restart reddit-scraper` | Restart the service |
-| `sudo systemctl status reddit-scraper` | Check status |
-| `sudo journalctl -u reddit-scraper -f` | View live logs |
-| `sudo journalctl -u reddit-scraper --since today` | Today's logs |
-
-### 4. Optional: Daily Scraper Service (Timer)
-
-Create a timer to run the scraper daily:
-
-```bash
-sudo nano /etc/systemd/system/reddit-scraper-daily.service
-```
-
-```ini
-[Unit]
-Description=Reddit URL Scraper Daily Fetch
-After=network.target
-
-[Service]
-Type=oneshot
-User=YOUR_USERNAME
-WorkingDirectory=/home/YOUR_USERNAME/Reddit-URL-Scraping
-ExecStart=/home/YOUR_USERNAME/Reddit-URL-Scraping/venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
-```
-
-Create the timer:
-
-```bash
-sudo nano /etc/systemd/system/reddit-scraper-daily.timer
-```
-
-```ini
-[Unit]
-Description=Run Reddit Scraper Daily at 9 AM
-
-[Timer]
-OnCalendar=*-*-* 09:00:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-```
-
-Enable the timer:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable reddit-scraper-daily.timer
-sudo systemctl start reddit-scraper-daily.timer
-
-# Check timer status
-systemctl list-timers | grep reddit
-```
-
-### Quick Setup Script
-
-Save this as `install-service.sh` and run with `sudo`:
-
-```bash
-#!/bin/bash
-set -e
-
-# Configuration
-USER=$(whoami)
-APP_DIR=$(pwd)
-
-echo "📦 Installing Reddit Scraper service..."
-echo "   User: $USER"
-echo "   Directory: $APP_DIR"
-
-# Create web dashboard service
-cat > /etc/systemd/system/reddit-scraper.service << SERVICEEOF
-[Unit]
-Description=Reddit URL Scraper Web Dashboard
-After=network.target
-
-[Service]
-Type=simple
-User=$USER
-WorkingDirectory=$APP_DIR
-ExecStart=$APP_DIR/venv/bin/python web_viewer.py
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-SERVICEEOF
-
-# Reload and enable
-systemctl daemon-reload
-systemctl enable reddit-scraper
-systemctl start reddit-scraper
-
-echo "✅ Service installed!"
-echo ""
-echo "Commands:"
-echo "  sudo systemctl status reddit-scraper"
-echo "  sudo systemctl restart reddit-scraper"
-echo "  sudo journalctl -u reddit-scraper -f"
-```
-
-Run:
-```bash
-chmod +x install-service.sh
-sudo ./install-service.sh
-```
-
-## Production Deployment (VPS with nginx + SSL)
-
-One-command installation for Ubuntu/Debian VPS with nginx and Let's Encrypt SSL.
-
-### Prerequisites
-
-- Ubuntu 20.04+ or Debian 11+ VPS
-- Domain pointing to your VPS IP
-- Root access (sudo)
-
-### Quick Install
-
-```bash
-# Clone repository
-git clone https://github.com/saun1790/Reddit-URL-Scraping.git
-cd Reddit-URL-Scraping
-
-# Run production installer
-sudo ./install-production.sh yourdomain.com your-email@example.com
-```
-
-### What the installer does:
-
-1. ✅ Installs Python, nginx, certbot, ufw
-2. ✅ Creates Python virtual environment
-3. ✅ Generates secure admin credentials (saved to `.env`)
-4. ✅ Configures systemd service (auto-start on boot)
-5. ✅ Configures daily scraper timer (9 AM)
-6. ✅ Sets up nginx as reverse proxy
-7. ✅ Obtains SSL certificate from Let's Encrypt
-8. ✅ Configures firewall (ports 22, 80, 443)
-
-### After Installation
-
-Your app will be live at `https://yourdomain.com`
-
-**View credentials:**
-```bash
-cat .env
-```
-
-**Service commands:**
-```bash
-sudo systemctl status reddit-scraper      # Check status
-sudo systemctl restart reddit-scraper     # Restart
-sudo systemctl stop reddit-scraper        # Stop
-sudo journalctl -u reddit-scraper -f      # Live logs
-```
-
-**SSL certificate renewal (automatic, but to test):**
-```bash
-sudo certbot renew --dry-run
-```
-
-### Manual nginx Configuration
-
-If you prefer manual setup:
-
-```nginx
-# /etc/nginx/sites-available/reddit-scraper
-server {
-    listen 80;
-    server_name yourdomain.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:3010;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Then run:
-```bash
-sudo ln -s /etc/nginx/sites-available/reddit-scraper /etc/nginx/sites-enabled/
-sudo certbot --nginx -d yourdomain.com
-sudo systemctl restart nginx
-```
-
-### Environment Variables
-
-The app supports these environment variables (via `.env` file):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ADMIN_USERNAME` | admin | Login username |
-| `ADMIN_PASSWORD` | (generated) | Login password |
-| `SECRET_KEY` | (generated) | Flask session key |
-| `DEBUG` | true | Debug mode (false in production) |
-
-### Security Notes
-
-- `.env` file has `chmod 600` (only owner can read)
-- nginx proxies to localhost only (3010 not exposed)
-- Firewall blocks all ports except 22, 80, 443
-- SSL auto-renews via certbot timer
+**Última actualización:** Enero 2026  
+**Versión:** 1.0  
+**Licencia:** MIT
