@@ -59,6 +59,9 @@ python3 -m venv venv
 
 ### Windows (PowerShell)
 ```powershell
+# If you get execution policy error, run this first:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
 git clone https://github.com/saun1790/Reddit-URL-Scraping.git
 cd Reddit-URL-Scraping
 python -m venv venv
@@ -91,6 +94,8 @@ Open your browser: **http://localhost:3010**
 ## Command Line Usage
 
 ### Backfill (Historical Data)
+
+**Linux / macOS:**
 ```bash
 # Last 30 days
 ./venv/bin/python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
@@ -99,19 +104,49 @@ Open your browser: **http://localhost:3010**
 ./venv/bin/python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups entrepreneur
 ```
 
+**Windows:**
+```powershell
+# Last 30 days
+.\venv\Scripts\python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
+
+# Last 6 months, multiple subreddits
+.\venv\Scripts\python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups entrepreneur
+```
+
 ### Daily Update
+
+**Linux / macOS:**
 ```bash
 ./venv/bin/python reddit_scraper_noauth.py --daily --subreddits SideProject
 ```
 
+**Windows:**
+```powershell
+.\venv\Scripts\python reddit_scraper_noauth.py --daily --subreddits SideProject
+```
+
 ### Export to CSV
+
+**Linux / macOS:**
 ```bash
 ./venv/bin/python reddit_scraper_noauth.py --export urls.csv
 ```
 
+**Windows:**
+```powershell
+.\venv\Scripts\python reddit_scraper_noauth.py --export urls.csv
+```
+
 ### View Statistics
+
+**Linux / macOS:**
 ```bash
 ./venv/bin/python reddit_scraper_noauth.py --stats
+```
+
+**Windows:**
+```powershell
+.\venv\Scripts\python reddit_scraper_noauth.py --stats
 ```
 
 ## Running in Background
@@ -131,11 +166,19 @@ tail -f web_viewer.log
 
 ### Windows (PowerShell)
 ```powershell
-# Start
+# Option 1: Using pythonw (no console window)
+.\venv\Scripts\pythonw.exe web_viewer.py
+
+# Option 2: Using Start-Process (hidden window)
 Start-Process -WindowStyle Hidden -FilePath ".\venv\Scripts\python.exe" -ArgumentList "web_viewer.py"
 
-# Stop
-Get-Process python | Stop-Process
+# Stop the process
+Stop-Process -Name python
+# or
+Stop-Process -Name pythonw
+
+# Check if running
+Get-Process python* | Select-Object Name, Id, CPU
 ```
 
 ## Automation (Cron)
