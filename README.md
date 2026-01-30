@@ -1,139 +1,139 @@
-# Reddit URL Scraper - Manual de Usuario
+# Reddit URL Scraper - User Manual
 
-Sistema para extraer y organizar URLs compartidas en subreddits de Reddit.
+System to extract and organize URLs shared in Reddit subreddits.
 
-## 🎯 ¿Qué hace?
+## 🎯 What does it do?
 
-Recopila automáticamente **todas las URLs** (enlaces web) de posts en los subreddits que configures:
-- Proyectos, startups, herramientas
-- Apps, sitios web, demos
-- Todo se guarda en una base de datos
-- Dashboard web para ver y buscar fácilmente
+Automatically collects **all URLs** (web links) from posts in the subreddits you configure:
+- Projects, startups, tools
+- Apps, websites, demos
+- Everything is saved in a database
+- Web dashboard to view and search easily
 
-## ✨ Características
+## ✨ Features
 
-- 📊 **Dashboard Visual** - Interfaz web fácil de usar
-- 🔍 **Búsqueda** - Encuentra URLs por palabra clave
-- 📥 **Exportar a Excel** - Descarga datos en CSV
-- 🔄 **Actualización Diaria** - Solo obtiene posts nuevos
-- 📚 **Historial Completo** - Puede obtener posts de hasta 6 meses
-- 🚫 **Sin duplicados** - No guarda la misma URL dos veces
-- 🔓 **Sin cuenta Reddit** - No requiere login
+- 📊 **Visual Dashboard** - Easy-to-use web interface
+- 🔍 **Search** - Find URLs by keyword
+- 📥 **Export to Excel** - Download data as CSV
+- 🔄 **Daily Updates** - Only gets new posts
+- 📚 **Complete History** - Can fetch posts up to 6 months old
+- 🚫 **No Duplicates** - Doesn't save the same URL twice
+- 🔓 **No Reddit Account** - No login required
 
-## 📋 Requisitos Previos (Windows)
+## 📋 Prerequisites (Windows)
 
-1. **Python 3.8 o superior**
-   - Descargar de: https://www.python.org/downloads/
-   - ⚠️ **IMPORTANTE:** Marcar "Add Python to PATH" durante instalación
+1. **Python 3.8 or higher**
+   - Download from: https://www.python.org/downloads/
+   - ⚠️ **IMPORTANT:** Check "Add Python to PATH" during installation
 
-2. **Git** (opcional, para actualizaciones)
-   - Descargar de: https://git-scm.com/download/win
+2. **Git** (optional, for updates)
+   - Download from: https://git-scm.com/download/win
 
 ---
 
-## 🚀 Instalación en Windows
+## 🚀 Installation on Windows
 
-### Paso 1: Descargar el Proyecto
+### Step 1: Download the Project
 
-**Opción A - Con Git:**
+**Option A - With Git:**
 ```powershell
 git clone https://github.com/saun1790/Reddit-URL-Scraping.git
 cd Reddit-URL-Scraping
 ```
 
-**Opción B - Sin Git:**
-1. Ve a: https://github.com/saun1790/Reddit-URL-Scraping
-2. Clic en botón verde "Code" → "Download ZIP"
-3. Descomprime el archivo
-4. Abre PowerShell en esa carpeta (Shift + Click derecho → "Abrir PowerShell aquí")
+**Option B - Without Git:**
+1. Go to: https://github.com/saun1790/Reddit-URL-Scraping
+2. Click green "Code" button → "Download ZIP"
+3. Extract the file
+4. Open PowerShell in that folder (Shift + Right-click → "Open PowerShell here")
 
-### Paso 2: Instalar Dependencias
+### Step 2: Install Dependencies
 
 ```powershell
-# Si te da error de permisos, ejecuta esto primero:
+# If you get permission error, run this first:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-# Crear entorno virtual
+# Create virtual environment
 python -m venv venv
 
-# Instalar librerías
+# Install libraries
 .\venv\Scripts\pip install -r requirements.txt
 ```
 
-✅ **¡Instalación completa!**
+✅ **Installation complete!**
 
 ---
 
-## 🖥️ Usar el Dashboard
+## 🖥️ Using the Dashboard
 
-### Iniciar el Sistema
+### Start the System
 
 ```powershell
 .\venv\Scripts\python web_viewer.py
 ```
 
-Verás algo como:
+You'll see something like:
 ```
  * Running on http://127.0.0.1:3010
 ```
 
-Abre tu navegador en: **http://localhost:3010**
+Open your browser at: **http://localhost:3010**
 
-### Configurar Subreddits
+### Configure Subreddits
 
-1. Clic en **⚙️ Settings** (esquina superior derecha)
-2. Escribe el nombre del subreddit **sin** "r/" (ejemplo: `SideProject`)
-3. Presiona Enter o clic en "+"
-4. Para eliminar: clic en ❌ al lado del nombre
+1. Click **⚙️ Settings** (top right corner)
+2. Type the subreddit name **without** "r/" (example: `SideProject`)
+3. Press Enter or click "+"
+4. To remove: click ❌ next to the name
 
-**Subreddits recomendados:**
-- `SideProject` - Proyectos personales
-- `startups` - Startups y emprendimiento  
-- `entrepreneur` - Negocios
-- `InternetIsBeautiful` - Sitios web interesantes
+**Recommended subreddits:**
+- `SideProject` - Personal projects
+- `startups` - Startups and entrepreneurship  
+- `entrepreneur` - Business
+- `InternetIsBeautiful` - Interesting websites
 
-### Obtener URLs
+### Fetch URLs
 
-1. Clic en **⚡ Fetch URLs**
-2. Selecciona modo:
-   - **Daily** (rápido, 1-2 min) - Solo posts nuevos
-   - **Backfill** (lento, 5-10 min) - Posts históricos
-3. Clic en **Start**
-4. Espera a que termine
+1. Click **⚡ Fetch URLs**
+2. Select mode:
+   - **Daily** (fast, 1-2 min) - Only new posts
+   - **Backfill** (slow, 5-10 min) - Historical posts
+3. Click **Start**
+4. Wait for completion
 
-### Buscar y Filtrar
+### Search and Filter
 
-- **Búsqueda:** Escribe palabra clave (ej: "AI", "SaaS")
-- **Filtro:** Desplegable para ver solo un subreddit
-- **Exportar:** Botón "📥 Export CSV" descarga todo en Excel
+- **Search:** Type keyword (e.g., "AI", "SaaS")
+- **Filter:** Dropdown to view only one subreddit
+- **Export:** "📥 Export CSV" button downloads everything to Excel
 
 ---
 
-## 💻 Uso Desde Línea de Comandos
+## 💻 Command Line Usage
 
-### Actualización Diaria (Recomendado)
+### Daily Update (Recommended)
 
 ```powershell
 .\venv\Scripts\python reddit_scraper_noauth.py --daily --subreddits SideProject startups
 ```
 
-### Obtener Histórico (Primera Vez)
+### Get Historical Data (First Time)
 
 ```powershell
-# Últimos 30 días
+# Last 30 days
 .\venv\Scripts\python reddit_scraper_noauth.py --backfill 30 --subreddits SideProject
 
-# Últimos 6 meses
+# Last 6 months
 .\venv\Scripts\python reddit_scraper_noauth.py --backfill 180 --subreddits SideProject startups
 ```
 
-### Exportar a CSV
+### Export to CSV
 
 ```powershell
 .\venv\Scripts\python reddit_scraper_noauth.py --export urls.csv
 ```
 
-### Ver Estadísticas
+### View Statistics
 
 ```powershell
 .\venv\Scripts\python reddit_scraper_noauth.py --stats
@@ -141,134 +141,134 @@ Abre tu navegador en: **http://localhost:3010**
 
 ---
 
-## 🔄 Actualizar el Sistema
+## 🔄 Update the System
 
-Si hay una versión nueva disponible:
+If a new version is available:
 
 ```powershell
-# Con Git
+# With Git
 git pull
 
-# Reinstalar dependencias (si hubo cambios)
+# Reinstall dependencies (if there were changes)
 .\venv\Scripts\pip install -r requirements.txt --upgrade
 ```
 
 ---
 
-## 📊 Estructura de Datos
+## 📊 Data Structure
 
-Los datos se guardan en `reddit_urls.db` (base de datos SQLite)
+Data is saved in `reddit_urls.db` (SQLite database)
 
-| Campo | Descripción |
+| Field | Description |
 |-------|-------------|
-| `url` | Enlace web encontrado en el post |
-| `post_date` | Fecha del post (UTC) |
-| `subreddit` | De qué subreddit viene |
-| `post_id` | ID del post en Reddit |
+| `url` | Web link found in post |
+| `post_date` | Post date (UTC) |
+| `subreddit` | Which subreddit it comes from |
+| `post_id` | Reddit post ID |
 
 ---
 
-## 🆘 Solución de Problemas
+## 🆘 Troubleshooting
 
-### "Puerto 3010 ya está en uso"
+### "Port 3010 already in use"
 
-Significa que ya tienes el dashboard abierto. Cierra la ventana anterior o:
+Means you already have the dashboard open. Close the previous window or:
 
 ```powershell
-# Ver qué está usando el puerto
+# See what's using the port
 netstat -ano | findstr :3010
 
-# Matar el proceso (reemplaza PID con el número que aparece)
-taskkill /PID <numero> /F
+# Kill the process (replace PID with the number that appears)
+taskkill /PID <number> /F
 ```
 
 ### "ModuleNotFoundError: No module named 'flask'"
 
-Reinstala las dependencias:
+Reinstall dependencies:
 
 ```powershell
 .\venv\Scripts\pip install -r requirements.txt
 ```
 
-### "Error de permisos al activar venv"
+### "Permission error when activating venv"
 
-Ejecuta primero:
+Run this first:
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-### Scraping muy lento
+### Scraping very slow
 
-- Usa **Daily** en lugar de **Backfill**
-- Reduce el número de días en Backfill
-- Verifica tu conexión a internet
+- Use **Daily** instead of **Backfill**
+- Reduce the number of days in Backfill
+- Check your internet connection
 
-### No encuentra URLs nuevas
+### Not finding new URLs
 
-Posibles causas:
-- No hay posts nuevos en ese subreddit
-- Ya tienes todos los posts recientes
-- El subreddit está inactivo
+Possible causes:
+- No new posts in that subreddit
+- You already have all recent posts
+- The subreddit is inactive
 
-**Solución:** Prueba otro subreddit más activo
+**Solution:** Try another more active subreddit
 
 ---
 
-## 📁 Archivos del Proyecto
+## 📁 Project Files
 
 ```
 Reddit-URL-Scraping/
-├── web_viewer.py             # Dashboard web
-├── reddit_scraper_noauth.py  # Scraper (línea de comandos)
-├── database.py               # Manejo de base de datos
-├── requirements.txt          # Librerías necesarias
-├── USER_GUIDE.md            # Guía completa de usuario (NO TÉCNICA)
+├── web_viewer.py             # Web dashboard
+├── reddit_scraper_noauth.py  # Scraper (command line)
+├── database.py               # Database management
+├── requirements.txt          # Required libraries
+├── USER_GUIDE.md            # Complete user guide (NON-TECHNICAL)
 ├── templates/
-│   └── index.html           # Interfaz del dashboard
-└── reddit_urls.db           # Base de datos (se crea automáticamente)
+│   └── index.html           # Dashboard interface
+└── reddit_urls.db           # Database (created automatically)
 ```
 
 ---
 
-## ❓ Preguntas Frecuentes
+## ❓ Frequently Asked Questions
 
-**¿Necesito una cuenta de Reddit?**  
-No, el sistema funciona sin autenticación.
+**Do I need a Reddit account?**  
+No, the system works without authentication.
 
-**¿Cuántos subreddits puedo agregar?**  
-Todos los que quieras, pero recomendamos 3-5 para empezar.
+**How many subreddits can I add?**  
+As many as you want, but we recommend 3-5 to start.
 
-**¿Los datos se guardan permanentemente?**  
-Sí, todo se guarda en `reddit_urls.db`. No se pierde al cerrar.
+**Is the data saved permanently?**  
+Yes, everything is saved in `reddit_urls.db`. It's not lost when you close.
 
-**¿Puedo usar esto en otra computadora?**  
-Sí, copia la carpeta completa (incluye el archivo `.db`).
+**Can I use this on another computer?**  
+Yes, copy the entire folder (includes the `.db` file).
 
-**¿Cada cuánto debo ejecutar el scraper?**  
-Depende de tus necesidades:
-- Diario si quieres estar al día
-- Semanal si solo revisas periódicamente
-- Cuando lo necesites
-
----
-
-## 📚 Documentación Adicional
-
-- **USER_GUIDE.md** - Guía completa para usuarios (recomendado)
-- **SUPER_SCRAPING_AGENT_PROMPT.md** - Documentación técnica avanzada
+**How often should I run the scraper?**  
+Depends on your needs:
+- Daily if you want to stay up to date
+- Weekly if you only check periodically
+- Whenever you need it
 
 ---
 
-## 📞 Soporte
+## 📚 Additional Documentation
 
-Si tienes problemas:
-1. Revisa esta guía primero
-2. Consulta **USER_GUIDE.md** para más detalles
-3. Verifica que tienes la última versión (`git pull`)
+- **USER_GUIDE.md** - Complete user guide (recommended)
+- **SUPER_SCRAPING_AGENT_PROMPT.md** - Advanced technical documentation
 
 ---
 
-**Última actualización:** Enero 2026  
-**Versión:** 1.0  
-**Licencia:** MIT
+## 📞 Support
+
+If you have problems:
+1. Check this guide first
+2. Consult **USER_GUIDE.md** for more details
+3. Verify you have the latest version (`git pull`)
+
+---
+
+**Last updated:** January 2026  
+**Version:** 1.0  
+**License:** MIT
